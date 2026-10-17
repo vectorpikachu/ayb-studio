@@ -12,6 +12,7 @@ import {
 import { AudioButton } from "@/components/audio-button";
 import { Reveal } from "@/components/reveal";
 import { getWordOfTheDay, posLabels } from "@/data/dictionary";
+import { grammarLessons } from "@/data/grammar";
 import { getCurrentUser } from "@/lib/server/auth";
 import { getLearnerOverview } from "@/lib/server/stats";
 
@@ -209,6 +210,13 @@ export default async function HomePage() {
                       <span className="font-arm text-[13px] text-[var(--muted)]">{overview.learnedCount}</span>
                       个已学词
                     </div>
+                    <span className="h-3 w-[1px] bg-[var(--line)]" />
+                    <Link href="/grammar" className="flex items-center gap-2 transition-colors hover:text-[var(--ink)]">
+                      <span className="font-arm text-[13px] text-[var(--muted)]">
+                        {overview.grammarCompleted}
+                      </span>
+                      / {grammarLessons.length} 语法
+                    </Link>
                     <span className="h-3 w-[1px] bg-[var(--line)]" />
                     <Link href="/review" className="transition-colors hover:text-[var(--ink)]">
                       {overview.dueCount > 0

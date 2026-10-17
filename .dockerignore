@@ -1,0 +1,32 @@
+# dependencies
+node_modules
+.npm-cache
+.pnpm-store
+
+# build output
+.next
+out
+next-env.d.ts
+*.tsbuildinfo
+
+# local learner data must never enter an image
+.data
+.data-*
+*.log
+
+# development reference material
+.ref
+qa-output
+
+# repository / editor
+.git
+.gitignore
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# local env files
+.env
+.env.*
+!.env.example

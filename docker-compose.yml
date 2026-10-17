@@ -1,0 +1,18 @@
+services:
+  ayb:
+    build: .
+    container_name: ayb
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      AYB_DATA_DIR: /data
+      AYB_ENABLE_DEMO: "false"
+      AYB_TIMEZONE: Asia/Shanghai
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+    volumes:
+      - ayb_data:/data
+    restart: unless-stopped
+
+volumes:
+  ayb_data:

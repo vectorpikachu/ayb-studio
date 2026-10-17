@@ -41,9 +41,19 @@ export const metadata: Metadata = {
   keywords: ["亚美尼亚语", "Armenian", "հայերեն", "language learning", "dictionary", "flashcards"],
   authors: [{ name: "Ayb Studio" }],
   icons: {
-    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
   manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "Ayb",
+    statusBarStyle: "black-translucent",
+  },
   openGraph: {
     title: "Ayb · 亚美尼亚语学习室",
     description: "从一个字母开始，学会亚美尼亚语。",

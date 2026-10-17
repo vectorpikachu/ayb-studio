@@ -12,6 +12,7 @@ next-env.d.ts
 
 # local data & uploads (never commit learner data)
 .data/
+.data-*/
 *.log
 
 # reference material used during design

@@ -61,7 +61,7 @@ export default async function GrammarLessonPage({ params }: LessonPageProps) {
             <ArrowLeft size={12} />
             返回语法地图
           </Link>
-          <div className="flex items-center gap-3 text-[9px] text-[var(--faint)]">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[9px] text-[var(--faint)]">
             <span className="font-mono">
               LESSON {String(lessonIndex).padStart(2, "0")} / {String(lessons.length).padStart(2, "0")}
             </span>
@@ -84,7 +84,7 @@ export default async function GrammarLessonPage({ params }: LessonPageProps) {
               <h1 className="mt-4 text-[38px] font-medium leading-[1.1] tracking-[-0.045em] text-[var(--ink)] md:text-[52px]">
                 {lesson.title}
               </h1>
-              <p className="mt-3 font-display text-[24px] leading-[1.25] text-[var(--accent)] md:text-[30px]" lang="hy">
+              <p className="mt-3 font-hand text-[29px] leading-[1.3] text-[var(--accent)] md:text-[38px]" lang="hy">
                 {lesson.titleHy}
               </p>
               <p className="mt-4 max-w-[600px] text-[11px] leading-[1.9] text-[var(--muted)]">

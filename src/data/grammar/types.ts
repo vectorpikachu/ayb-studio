@@ -1,4 +1,4 @@
-export type GrammarLevel = "A1" | "A2" | "B1";
+export type GrammarLevel = "A1" | "A2" | "B1" | "B2";
 
 export type GrammarExample = {
   hy: string;

@@ -351,7 +351,7 @@ export function ReviewStudio({
                       style={{ background: "var(--accent)" }}
                     />
                     <div className="relative">
-                      <p className="font-display text-[72px] leading-none text-[var(--accent)] md:text-[86px]" lang="hy">
+                      <p className="font-hand text-[86px] leading-none text-[var(--accent)] md:text-[104px]" lang="hy">
                         Ապրե՛ս
                       </p>
                       <h2 className="mt-5 text-[24px] font-medium tracking-[-0.03em] text-[var(--ink)] md:text-[30px]">
@@ -361,7 +361,7 @@ export function ReviewStudio({
                         {userName}，你今天和 {reviewedWords.length} 个词重新见了面。它们会在合适的时间，再回来。
                       </p>
 
-                      <div className="mx-auto mt-8 grid max-w-[470px] grid-cols-3 divide-x divide-[var(--line)] rounded-[16px] border border-[var(--line)] bg-[var(--surface)] py-4">
+                      <div className="mx-auto mt-8 grid max-w-[470px] grid-cols-3 divide-x divide-[var(--line)] rounded-[20px] border border-[var(--glass-edge)] bg-[var(--surface)] py-4 shadow-[inset_0_1px_0_var(--glass-inset)] backdrop-blur-xl">
                         <div>
                           <p className="text-[24px] leading-none text-[var(--ink)]">{reviewedWords.length}</p>
                           <p className="mt-1.5 text-[8px] text-[var(--faint)]">本轮词语</p>
@@ -420,7 +420,7 @@ export function ReviewStudio({
                     exit={{ opacity: 0 }}
                     className="surface-card flex min-h-[460px] flex-col items-center justify-center rounded-[28px] px-6 text-center"
                   >
-                    <p className="font-display text-[66px] leading-none text-[var(--accent)]" lang="hy">
+                    <p className="font-hand text-[78px] leading-none text-[var(--accent)]" lang="hy">
                       Հանգիստ
                     </p>
                     <h2 className="mt-5 text-[24px] font-medium tracking-[-0.03em] text-[var(--ink)]">
@@ -637,7 +637,7 @@ export function ReviewStudio({
                                   type="button"
                                   onClick={() => gradeCard(rating.grade)}
                                   disabled={pendingGrade !== null}
-                                  className="group flex min-h-[64px] flex-col items-start justify-between rounded-[11px] border border-[var(--line)] bg-[color-mix(in_srgb,var(--surface)_50%,transparent)] px-3 py-2.5 text-left transition-colors hover:border-[var(--line-strong)] hover:bg-[var(--surface)] disabled:cursor-wait disabled:opacity-60"
+                                  className="group flex min-h-[64px] flex-col items-start justify-between rounded-[14px] border border-[var(--glass-edge)] bg-[color-mix(in_srgb,var(--surface)_72%,transparent)] px-3 py-2.5 text-left shadow-[inset_0_1px_0_var(--glass-inset)] backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-[var(--surface-2)] disabled:cursor-wait disabled:opacity-60"
                                 >
                                   <div className="flex w-full items-center justify-between gap-2">
                                     <span className="flex items-center gap-1.5 text-[10px] font-semibold text-[var(--ink)]">

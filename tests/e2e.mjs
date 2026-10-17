@@ -142,17 +142,18 @@ try {
   await page.waitForTimeout(600);
   const writingTitle = `自动化测试 ${Date.now().toString(36)}`;
   await page.fill('input[aria-label="文章标题"]', writingTitle);
-  await page.fill(
-    'textarea[aria-label="亚美尼亚语正文"]',
-    "Սա փորձնական նախադասություն է։",
-  );
-  await page.waitForResponse(
+  const autosave = page.waitForResponse(
     (response) =>
       response.url().includes("/api/writings/") &&
       response.request().method() === "PATCH" &&
       response.status() === 200,
-    { timeout: 20_000 },
+    { timeout: 30_000 },
   );
+  await page.fill(
+    'textarea[aria-label="亚美尼亚语正文"]',
+    "Սա փորձնական նախադասություն է։",
+  );
+  await autosave;
   await page.waitForFunction(() => document.body.innerText.includes("已保存"), null, {
     timeout: 15_000,
   });

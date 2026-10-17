@@ -6,12 +6,12 @@ import { SiteFooter } from "@/components/site-footer";
 import { MobileDock } from "@/components/mobile-dock";
 import { getCurrentUser } from "@/lib/server/auth";
 
-const manrope = localFont({
-  src: "../../public/fonts/manrope-latin.woff2",
-  variable: "--font-manrope",
+const notoSans = localFont({
+  src: "../../public/fonts/noto-sans-latin.woff2",
+  variable: "--font-noto-sans",
   display: "swap",
-  weight: "200 800",
-  fallback: ["system-ui", "sans-serif"],
+  weight: "100 900",
+  fallback: ["Noto Sans", "system-ui", "sans-serif"],
 });
 
 const armenianSans = localFont({
@@ -22,12 +22,14 @@ const armenianSans = localFont({
   fallback: ["Noto Sans Armenian", "sans-serif"],
 });
 
-const armenianSerif = localFont({
-  src: "../../public/fonts/noto-serif-armenian-arm.woff2",
-  variable: "--font-serif-armenian",
+// Hovhannes Tumanian's hand, by Ruben Tarumian. Free for personal and
+// commercial use; see public/fonts/LICENSE-TUMANIAN.txt.
+const armenianHand = localFont({
+  src: "../../public/fonts/hovhannes-tumanian.woff2",
+  variable: "--font-handwriting",
   display: "swap",
-  weight: "100 900",
-  fallback: ["Noto Serif Armenian", "Georgia", "serif"],
+  weight: "400",
+  fallback: ["Noto Sans Armenian", "cursive"],
 });
 
 export const metadata: Metadata = {
@@ -65,7 +67,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#f4f0e7",
+  themeColor: "#f5f5f7",
 };
 
 const themeScript = `
@@ -88,7 +90,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       lang="zh-CN"
       data-theme="light"
       suppressHydrationWarning
-      className={`${manrope.variable} ${armenianSans.variable} ${armenianSerif.variable}`}
+      className={`${notoSans.variable} ${armenianSans.variable} ${armenianHand.variable}`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
@@ -96,7 +98,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       <body>
         <div className="ambient" aria-hidden />
         <div className="grain" aria-hidden />
-        <div className="flex min-h-screen flex-col">
+        <div className="relative z-10 flex min-h-screen flex-col">
           <SiteHeader user={user} />
           <main className="flex-1">{children}</main>
           <SiteFooter user={user} />

@@ -100,7 +100,7 @@ const features = [
     title: "语法地图",
     en: "Grammar",
     description:
-      "从字母表到格变化，九节循序渐进的语法课。解释、对照表、例句与课后小测，完整而轻巧。",
+      "从字母表到关系从句，十三节循序渐进的语法课。解释、对照表、例句与课后小测，完整而轻巧。",
     href: "/grammar",
     icon: Hash,
     accent: "var(--azure)",
@@ -149,8 +149,8 @@ export default async function HomePage() {
           <div className="relative z-10">
             <Reveal>
               <div className="mb-7 flex flex-wrap items-center gap-3">
-                <span className="inline-flex items-center gap-2 rounded-full border border-[var(--line)] bg-[color-mix(in_srgb,var(--elevated)_55%,transparent)] px-3 py-1.5 text-[9px] font-semibold tracking-[0.16em] text-[var(--muted)]">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
+                <span className="glass-soft inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[9px] font-semibold tracking-[0.16em] text-[var(--muted)]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)] shadow-[0_0_10px_2px_color-mix(in_srgb,var(--accent)_45%,transparent)]" />
                   {user ? `WELCOME BACK · ${user.name.toUpperCase()}` : "AYB · ARMENIAN STUDIO"}
                 </span>
                 <span className="hidden text-[9px] tracking-[0.15em] text-[var(--faint)] sm:inline">
@@ -182,7 +182,7 @@ export default async function HomePage() {
             <Reveal delay={0.12}>
               <p className="mt-7 max-w-[480px] text-[13px] leading-[1.85] text-[var(--muted)] md:text-[14px]">
                 Ayb 是一间安静的亚美尼亚语学习室。用词、语法与写作，慢慢靠近一门有一千六百年文字传统的语言。
-                <span className="mt-2 block text-[12px] text-[var(--faint)]">
+                <span className="mt-3 block font-hand text-[23px] leading-[1.5] text-[var(--accent)]">
                   Learn Armenian, letter by letter.
                 </span>
               </p>
@@ -277,9 +277,9 @@ export default async function HomePage() {
               <span className="orbit-dot dot-c" />
             </div>
 
-            <div className="mx-auto mt-1 flex max-w-[340px] items-center justify-between gap-4 text-[9px] tracking-[0.06em] text-[var(--faint)]">
-              <span className="font-arm text-[10px]">Լեզուն սկսվում է տառից։</span>
-              <span className="hidden sm:block">THE LANGUAGE BEGINS WITH A LETTER.</span>
+            <div className="mx-auto mt-4 flex max-w-[440px] flex-col items-center gap-1.5 text-center text-[8px] tracking-[0.12em] text-[var(--faint)]">
+              <span className="whitespace-nowrap font-hand text-[23px] leading-[1.3] text-[var(--accent)]">Լեզուն սկսվում է տառից։</span>
+              <span>THE LANGUAGE BEGINS WITH A LETTER.</span>
             </div>
           </Reveal>
         </div>
@@ -342,7 +342,7 @@ export default async function HomePage() {
                 </Link>
               </div>
 
-              <div className="relative flex flex-col justify-between border-t border-[var(--line)] bg-[color-mix(in_srgb,var(--surface-2)_40%,transparent)] p-6 md:border-l md:border-t-0 md:p-10 lg:p-12">
+              <div className="relative flex flex-col justify-between border-t border-[var(--line)] bg-[color-mix(in_srgb,var(--surface-2)_30%,transparent)] p-6 backdrop-blur-xl md:border-l md:border-t-0 md:p-10 lg:p-12">
                 <div>
                   <span className="eyebrow">例句 · In a sentence</span>
                   <p className="mt-5 font-arm text-[22px] leading-[1.55] text-[var(--ink)] md:text-[25px]">
@@ -420,7 +420,7 @@ export default async function HomePage() {
 
                   <div className="flex flex-1 flex-col justify-end border-t border-[var(--line)] p-6">
                     <div className="flex items-center justify-between">
-                      <span className="font-arm text-[11px] text-[var(--faint)]">{feature.hij}</span>
+                      <span className="font-hand text-[17px] text-[var(--faint)]">{feature.hij}</span>
                       <span className="text-[8px] tracking-[0.16em] text-[var(--faint)]">
                         {feature.en.toUpperCase()}
                       </span>
@@ -447,9 +447,9 @@ export default async function HomePage() {
 
       <section className="container-ayb mt-24 md:mt-32">
         <Reveal>
-          <div className="relative grid overflow-hidden rounded-[28px] border border-[var(--line)] bg-[var(--elevated)] md:grid-cols-[1fr_0.9fr]">
+          <div className="glass relative grid overflow-hidden rounded-[36px] md:grid-cols-[1fr_0.9fr]">
             <div
-              className="pointer-events-none absolute -left-28 top-0 h-72 w-72 rounded-full opacity-20 blur-[90px]"
+              className="pointer-events-none absolute -left-28 top-0 h-72 w-72 rounded-full opacity-30 blur-[90px]"
               style={{ background: "var(--accent)" }}
             />
             <div className="relative z-10 p-8 md:p-12 lg:p-16">
@@ -487,15 +487,15 @@ export default async function HomePage() {
                   style={{ borderColor: "var(--line)" }}
                 />
               </div>
-              <div className="relative w-full max-w-[330px] rotate-[-2deg] rounded-[18px] border border-[var(--line-strong)] bg-[var(--paper)] p-6 shadow-[0_30px_70px_rgba(0,0,0,.22)] transition-transform duration-500 ease-[var(--ease-out-expo)] hover:rotate-0">
+              <div className="surface-card relative w-full max-w-[330px] rotate-[-2deg] rounded-[24px] p-6 transition-transform duration-500 ease-[var(--ease-out-expo)] hover:rotate-0">
                 <div className="flex items-center justify-between border-b border-[var(--line)] pb-3">
                   <span className="text-[8px] tracking-[0.16em] text-[var(--faint)]">NOTE · 001</span>
-                  <span className="font-arm text-[9px] text-[var(--faint)]">17.10.2026</span>
+                  <span className="font-hand text-[13px] text-[var(--faint)]">17.10.2026</span>
                 </div>
-                <p className="mt-5 font-display text-[22px] leading-[1.35] text-[var(--ink)]">
+                <p className="mt-5 font-hand text-[28px] leading-[1.4] text-[var(--ink)]">
                   Այսօր ես սովորեցի մի նոր բառ։
                 </p>
-                <p className="mt-2 font-arm text-[12px] leading-[1.7] text-[var(--muted)]">
+                <p className="mt-2.5 font-arm text-[12px] leading-[1.75] text-[var(--muted)]">
                   Այն փոքր է, ինչպես սերմը, բայց բացում է մի նոր աշխարհ։
                 </p>
                 <div className="mt-5 space-y-1.5">
@@ -518,12 +518,12 @@ export default async function HomePage() {
 
       <section className="container-ayb mt-28 md:mt-40">
         <Reveal>
-          <div className="mx-auto max-w-[900px] text-center">
-            <span className="font-display text-[70px] leading-[0.4] text-[var(--accent)] opacity-60">
+          <div className="glass mx-auto max-w-[980px] rounded-[40px] px-6 py-12 text-center md:px-16 md:py-16">
+            <span className="font-hand text-[64px] leading-[0.4] text-[var(--accent)] opacity-70">
               “
             </span>
             <blockquote className="mt-3">
-              <p className="font-display text-[30px] leading-[1.35] tracking-[-0.015em] text-[var(--ink)] md:text-[44px]">
+              <p className="font-hand text-[34px] leading-[1.45] tracking-[0.005em] text-[var(--ink)] md:text-[50px]">
                 Ես իմ անուշ Հայաստանի
                 <br />
                 արևահամ բարն եմ սիրում։

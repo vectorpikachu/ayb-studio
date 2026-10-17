@@ -84,6 +84,11 @@ export const alphabetAndSounds: GrammarLesson = {
         },
         {
           type: "note",
+          title: "印刷体与手写体",
+          text: "每张字母卡上有两行：上面是 Noto Sans Armenian 的印刷体，下面红色的小字是 Hovhannes Tumanian 的手写风格。亚美尼亚语的手写体（շղագիր）和印刷体差别很大，这里只是一个可供辨认的样本，不是唯一标准。先熟悉印刷体，再慢慢读手写。",
+        },
+        {
+          type: "note",
           title: "三个容易混淆的声音",
           text: "Թ/Տ 是送气 t 与不送气 t，Ծ/Ց 是 ts 与送气 ts，Ք/Կ 是送气 k 与不送气 k。初学时先模仿节奏，不必用中文拼音完全等同。",
         },

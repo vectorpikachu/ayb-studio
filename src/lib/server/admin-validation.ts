@@ -133,7 +133,7 @@ const lessonSchema = z
   .object({
     id: idSchema,
     order: z.number().int().min(1).max(999),
-    level: z.enum(["A1", "A2", "B1"]),
+    level: z.enum(["A1", "A2", "B1", "B2"]),
     minutes: z.number().int().min(1).max(180),
     title: shortText(200),
     titleHy: shortText(200),

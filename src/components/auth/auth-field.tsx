@@ -25,8 +25,8 @@ export function AuthField({ label, icon, trailing, error, hint, id, className, .
       </div>
       <div
         className={cn(
-          "flex h-[48px] items-center rounded-xl border bg-[var(--surface)] transition-colors focus-within:border-[color-mix(in_srgb,var(--accent)_60%,transparent)] focus-within:bg-[var(--elevated)]",
-          error ? "border-[var(--accent)]" : "border-[var(--line)]",
+          "flex h-[48px] items-center rounded-2xl border bg-[var(--surface)] shadow-[inset_0_1px_0_var(--glass-inset)] backdrop-blur-xl transition-colors focus-within:border-[color-mix(in_srgb,var(--accent)_60%,transparent)] focus-within:bg-[var(--elevated)]",
+          error ? "border-[var(--accent)]" : "border-[var(--glass-edge)]",
         )}
       >
         <span className="ml-3.5 mr-3 shrink-0 text-[var(--faint)]" aria-hidden>

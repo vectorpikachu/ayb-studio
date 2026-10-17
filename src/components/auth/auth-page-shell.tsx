@@ -46,8 +46,8 @@ export function AuthPageShell({ mode, children }: { mode: Mode; children: ReactN
         </span>
       </div>
 
-      <div className="grid overflow-hidden rounded-[30px] border border-[var(--line)] bg-[var(--elevated)] shadow-[0_30px_100px_rgba(0,0,0,.12)] lg:grid-cols-[0.92fr_1.08fr]">
-        <aside className="relative hidden min-h-[640px] overflow-hidden border-r border-[var(--line)] bg-[var(--surface)] p-10 lg:flex lg:flex-col lg:justify-between xl:p-12">
+      <div className="glass-strong grid overflow-hidden rounded-[36px] lg:grid-cols-[0.92fr_1.08fr]">
+        <aside className="relative hidden min-h-[640px] overflow-hidden border-r border-[var(--line)] bg-[color-mix(in_srgb,var(--surface)_55%,transparent)] p-10 backdrop-blur-xl lg:flex lg:flex-col lg:justify-between xl:p-12">
           <div className="pointer-events-none absolute inset-0" aria-hidden>
             <div
               className="absolute -left-24 -top-24 h-[420px] w-[420px] rounded-full opacity-40 blur-[80px]"
@@ -68,7 +68,7 @@ export function AuthPageShell({ mode, children }: { mode: Mode; children: ReactN
 
           <div className="relative z-10">
             <p className="eyebrow">{content.eyebrow}</p>
-            <p className="mt-14 select-none font-display text-[88px] leading-none tracking-[-0.02em] text-[var(--ink)] xl:text-[104px]" lang="hy">
+            <p className="mt-14 select-none font-hand text-[96px] leading-none tracking-[-0.01em] text-[var(--accent)] xl:text-[116px]" lang="hy">
               {content.word}
             </p>
             <h2 className="mt-10 max-w-[360px] whitespace-pre-line text-[27px] font-medium leading-[1.3] tracking-[-0.035em] text-[var(--ink)]">
@@ -90,7 +90,7 @@ export function AuthPageShell({ mode, children }: { mode: Mode; children: ReactN
           </div>
 
           <div className="relative z-10 border-t border-[var(--line)] pt-5">
-            <p className="font-arm max-w-[300px] text-[15px] leading-[1.6] text-[var(--ink)]" lang="hy">
+            <p className="font-hand max-w-[300px] text-[24px] leading-[1.5] text-[var(--ink)]" lang="hy">
               {content.quote}
             </p>
             <div className="mt-3 flex items-center justify-between gap-3">

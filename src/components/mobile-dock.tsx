@@ -24,7 +24,7 @@ export function MobileDock() {
   return (
     <nav
       aria-label="移动端导航"
-      className="fixed inset-x-3 bottom-3 z-50 mx-auto flex max-w-[430px] items-center justify-around rounded-[22px] border border-[var(--line)] bg-[var(--nav-bg)] px-1.5 py-2 shadow-[0_18px_50px_rgba(0,0,0,.28)] backdrop-blur-2xl md:hidden"
+      className="fixed inset-x-3 bottom-3 z-50 mx-auto flex max-w-[430px] items-center justify-around rounded-[24px] border border-[var(--glass-edge)] bg-[var(--nav-bg)] px-1.5 py-2 shadow-[0_24px_60px_-20px_var(--glass-shadow),inset_0_1px_0_var(--glass-inset)] backdrop-blur-2xl md:hidden"
     >
       {mobileNav.map((item) => {
         const Icon = icons[item.icon];

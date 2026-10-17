@@ -33,7 +33,7 @@ export function ThemeToggle({ className }: { className?: string }) {
       onClick={toggle}
       aria-label={mounted ? (theme === "dark" ? "切换到浅色主题" : "切换到深色主题") : "切换主题"}
       className={cn(
-        "grid h-9 w-9 place-items-center rounded-full border border-[var(--line)] bg-[var(--nav-bg)] text-[var(--muted)] backdrop-blur-xl transition-colors hover:border-[var(--line-strong)] hover:text-[var(--ink)]",
+        "grid h-9 w-9 place-items-center rounded-full border border-[var(--glass-edge)] bg-[var(--nav-bg)] text-[var(--muted)] shadow-[inset_0_1px_0_var(--glass-inset)] backdrop-blur-xl transition-colors hover:border-[var(--line-strong)] hover:text-[var(--ink)]",
         className,
       )}
     >

@@ -195,7 +195,7 @@ export function DictionaryExplorer({ words }: { words: DictionaryWord[] }) {
 
         <Reveal delay={0.08}>
           <div className="mt-10">
-            <div className="group relative flex items-center rounded-[18px] border border-[var(--line)] bg-[var(--elevated)] px-5 shadow-[0_18px_60px_rgba(0,0,0,.08)] transition-colors focus-within:border-[color-mix(in_srgb,var(--accent)_55%,transparent)] md:px-6">
+            <div className="glass-strong group relative flex items-center rounded-[22px] px-5 transition-shadow focus-within:shadow-[0_28px_70px_-28px_var(--glass-shadow),inset_0_1px_0_var(--glass-inset)] md:px-6">
               <Search
                 size={18}
                 strokeWidth={1.6}
@@ -392,7 +392,7 @@ export function DictionaryExplorer({ words }: { words: DictionaryWord[] }) {
                   key={word.id}
                   type="button"
                   onClick={() => setSelectedWord(word)}
-                  className="surface-card word-fit-container group relative overflow-hidden rounded-[20px] p-5 text-left transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:border-[var(--line-strong)] hover:shadow-[0_18px_40px_rgba(0,0,0,.1)] md:p-6"
+                  className="surface-card word-fit-container group relative overflow-hidden rounded-[24px] p-5 text-left transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-1 hover:shadow-[0_30px_60px_-30px_var(--glass-shadow)] md:p-6"
                   aria-label={`查看词条 ${word.hy}`}
                 >
                   <span
@@ -466,8 +466,8 @@ export function DictionaryExplorer({ words }: { words: DictionaryWord[] }) {
             })}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center rounded-[24px] border border-dashed border-[var(--line-strong)] px-6 py-20 text-center">
-            <span className="font-display text-[56px] leading-none text-[var(--accent)] opacity-70" lang="hy">
+          <div className="glass-soft flex flex-col items-center justify-center rounded-[28px] px-6 py-20 text-center">
+            <span className="font-hand text-[64px] leading-none text-[var(--accent)] opacity-80" lang="hy">
               Չգտնվեց
             </span>
             <p className="mt-5 text-[14px] font-medium text-[var(--ink)]">没有找到这个词。</p>
@@ -528,7 +528,7 @@ export function DictionaryExplorer({ words }: { words: DictionaryWord[] }) {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 18, scale: 0.99 }}
                 transition={{ type: "spring", stiffness: 260, damping: 28 }}
-                className="surface-card relative my-4 w-full max-w-[700px] overflow-hidden rounded-[26px] shadow-[0_40px_120px_rgba(0,0,0,.35)]"
+                className="glass-strong relative my-4 w-full max-w-[700px] overflow-hidden rounded-[30px]"
                 onClick={(event) => event.stopPropagation()}
               >
                 <div

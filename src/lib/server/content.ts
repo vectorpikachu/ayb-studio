@@ -30,7 +30,7 @@ export async function getContentGrammarLesson(id: string): Promise<GrammarLesson
 }
 
 export function buildGrammarGroups(lessons: GrammarLesson[]) {
-  return (["A1", "A2", "B1"] as const).map((level) => ({
+  return (["A1", "A2", "B1", "B2"] as const).map((level) => ({
     level,
     label: grammarLevelLabels[level],
     lessons: lessons.filter((lesson) => lesson.level === level),

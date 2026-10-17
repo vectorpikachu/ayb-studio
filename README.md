@@ -3,7 +3,7 @@
 > 一间安静的亚美尼亚语学习室。
 > Learn Armenian, letter by letter.
 
-Ayb 是一个可运行、可注册、按用户保存进度的亚美尼亚语学习 Web App。视觉语言借鉴 [Innei](https://innei.in/) 的 Shiro 主题：纸感背景、悬浮胶囊导航、大留白、细线框与克制的弹性动效；内容与视觉资产为独立实现，并加入石榴红、杏色与亚美尼亚字母作为品牌语言。
+Ayb 是一个可运行、可注册、按用户保存进度的亚美尼亚语学习 Web App。视觉语言以 Apple 的 Liquid Glass 为灵感：彩色光场、可透光的磨砂玻璃面板、悬浮胶囊导航、明亮的内描边与克制的弹性动效；内容与视觉资产为独立实现，并加入石榴红、杏色、亚美尼亚字母与手写体作为品牌语言。
 
 ## 预览
 
@@ -15,9 +15,9 @@ Ayb 是一个可运行、可注册、按用户保存进度的亚美尼亚语学�
 | --- | --- |
 | ![复习卡片](docs/screenshots/review.jpg) | ![语法课程](docs/screenshots/grammar.jpg) |
 
-| 私人写作室 | 日间主题 |
+| 私人写作室 | 深色主题 |
 | --- | --- |
-| ![写作室](docs/screenshots/write.jpg) | ![日间主题](docs/screenshots/home-light.jpg) |
+| ![写作室](docs/screenshots/write.jpg) | ![深色主题](docs/screenshots/home-dark.jpg) |
 
 ## 功能
 
@@ -25,7 +25,7 @@ Ayb 是一个可运行、可注册、按用户保存进度的亚美尼亚语学�
 - **搜索与筛选**：支持四种语言与转写搜索、按首字母筛选、按 10 个主题浏览、随机词条与详情弹窗；快捷键 `/` 聚焦搜索。
 - **带例句的背单词**：SM-2 思路改编的四档间隔重复；正面回忆、背面展示释义与例句；新词按主题混合排序；支持词典深链 `?word=jur`。
 - **连续学习记录**：按用户记录复习活动、到期词数、已学词数与连续天数；仪表数据会出现在首页与复习页。
-- **9 节语法课**：从字母、发音、人称、系词、名词、现在时、疑问否定，到数字形容词、过去将来、格与后置词。包含 38 字母全表、对照表、逐条例句与三题小测。
+- **13 节语法课**：从字母、发音、人称、系词、名词、现在时、疑问否定，到数字形容词、过去将来、格与后置词，再到关系从句、条件虚拟、被动使役与转述。包含 38 字母全表、对照表、逐条例句与课后小测。
 - **进度保存**：登录后小测通过（≥ 60%）才会写入完成记录；未通过不会误标完成。
 - **私人写作室**：创建、编辑、删除文章；草稿 / 完成状态；自动保存与 `Ctrl/⌘ + S`；中文对照；最多 8 个标签；预览；导出 `.txt`。
 - **账户系统**：注册、登录、退出、演示账号、HttpOnly 会话、30 天有效；每个用户的数据完全隔离。
@@ -103,6 +103,8 @@ docker compose up -d --build
 ```
 
 > Docker 是可选的：本地开发和预览只需要 Node.js。容器方式适合部署到 VPS / NAS；容器使用独立的数据卷，不会读取项目里的 `.data`。
+>
+> Windows 上的 Docker Desktop 需要 WSL2。Windows 家庭版不能使用 Hyper-V 后端；如果 Docker 提示 “WSL not installed”，请以管理员身份运行 `wsl --install`，重启后再执行 `docker compose up -d --build`。
 
 打开 <http://localhost:3000>。数据库存储在命名卷 `ayb_data` 中，容器重建不会丢失。生产部署请：
 
@@ -146,8 +148,8 @@ Windows 安装包与 macOS DMG 目前未做代码签名：Windows SmartScreen �
 ## 内容结构
 
 - **词典**：`136` 个词，10 个主题。
-- **语法**：`9` 节课，约 `89` 分钟阅读量，27 道自测题。
-- **字体**：Manrope 负责拉丁与 UI，Noto Sans Armenian 负责亚美尼亚语正文，Noto Serif Armenian 负责亚美尼亚语标题与写作；中文回退到系统 UI 字体（PingFang SC / Microsoft YaHei）。前三者自托管，不依赖 Google Fonts 运行时。
+- **语法**：`13` 节课，约 `145` 分钟阅读量，42 道自测题；覆盖 A1 到 B2。
+- **字体**：Noto Sans 负责拉丁与 UI，Noto Sans Armenian 负责亚美尼亚语印刷体正文，Hovhannes Tumanian 的手写体负责标题、引文与字母表里的手写对照；中文回退到系统 UI 字体（PingFang SC / Microsoft YaHei）。三者均自托管，不依赖 Google Fonts 运行时。
 - **内容语言**：中文为主要学习界面；词条保留英语、俄语、中文三种释义，方便多语学习者。
 
 词表与语法说明是面向初学者的种子内容，例句为学习场景原创；**在正式商业发布前，建议请亚美尼亚语母语者做一轮翻译与语用校订**，特别是格变化、动词变位与习惯搭配。
@@ -165,9 +167,10 @@ Windows 安装包与 macOS DMG 目前未做代码签名：Windows SmartScreen �
 
 ### 设计要点
 
-- 浅色纸张默认主题，可切到深色夜间主题；
-- 导航胶囊、细线分隔、衬线亚美尼亚语标题、衬线写作界面；
-- 字体分工而非单一字族：Google Fonts 的 Noto Sans 按文字系统拆成独立子集，亚美尼亚语子集不含中文；中文需要单独的 CJK 字体（本项目的做法是交给系统字体）。因此拉丁用 Manrope、亚美尼亚语正文用 Noto Sans Armenian、标题用 Noto Serif Armenian；
+- 浅色默认主题，可切到深色夜间主题；
+- **Liquid Glass 视觉语言**：彩色光场背景、可透光的磨砂面板、明亮的内描边与克制的高光；导航、按钮、卡片与写作纸张共享同一套玻璃材质；
+- **印刷体 + 手写体**：Noto Sans / Noto Sans Armenian 负责可读的印刷体，Hovhannes Tumanian 的手写体只出现在标题、引文、字母表与提示语里，形成克制的对照；
+- 字体统一到 Noto Sans 家族：拉丁、亚美尼亚语与 UI 使用同一套无衬线骨架，中文回退到系统 CJK 字体；不再使用衬线亚美尼亚语标题；
 - 首页、词典、复习、语法、写作分别有不同的编辑节奏，但共享同一套排版和间距系统；
 - 对移动端做专门处理：复习与写作编辑器会隐藏底部 Dock，保留完整操作空间；
 - 支持 `prefers-reduced-motion`。
@@ -214,7 +217,7 @@ src/
   components/                # 导航、词典、复习、语法、作者工具等 UI
   data/
     dictionary/              # 136 词条，按主题分文件
-    grammar/                 # 9 节课程内容
+    grammar/                 # 13 节课程内容
   lib/
     srs.ts                   # 纯函数间隔重复算法
     server/                  # JSON 数据库、会话、限流、业务服务
@@ -265,8 +268,9 @@ AYB_BROWSER_PATH="/path/to/chrome" npm run qa
 
 ## 致谢与许可
 
-- 视觉气质致敬 [Innei / Shiro](https://github.com/Innei/Shiro)，未复制其代码或资产。
-- 字体来自 Google Fonts：Noto Sans Armenian、Noto Serif Armenian、Manrope；均为 SIL Open Font License 1.1，许可文本在 `public/fonts/`。
+- 早期布局节奏参考 [Innei / Shiro](https://github.com/Innei/Shiro) 的悬浮胶囊导航与大留白；Liquid Glass 材质、配色与组件为独立实现，未复制其代码或资产。
+- 字体来自 Google Fonts：Noto Sans、Noto Sans Armenian；均为 SIL Open Font License 1.1，许可文本在 `public/fonts/`。
+- 手写体 Hovhannes Tumanian 由 Ruben Tarumian 设计，通过 [fonter.am](https://fonter.am/en/fonts/tumanian-dzeragir) 发布，作者声明可免费用于个人与商业项目；原始 TTF、WOFF2 转换版与许可说明在 `public/fonts/`。
 - 图标来自 [Lucide](https://lucide.dev/)（ISC）。
 - 亚美尼亚语例句与课程说明为 Ayb 项目内容，供学习与演示使用。
 - 本项目当前未附加代码开源许可证；若计划公开分发，请自行选择许可协议。

@@ -7,6 +7,10 @@ import { questionsNegation } from "./06-questions";
 import { numbersAdjectivesTime } from "./07-numbers";
 import { pastAndFuture } from "./08-past-future";
 import { casesAndPostpositions } from "./09-cases";
+import { relativeClauses } from "./10-relative-clauses";
+import { conditionalsSubjunctive } from "./11-conditionals";
+import { passiveCausative } from "./12-passive-causative";
+import { reportedSpeech } from "./13-reported-speech";
 import type { GrammarLesson } from "./types";
 
 export type {
@@ -28,12 +32,17 @@ export const grammarLessons: GrammarLesson[] = [
   numbersAdjectivesTime,
   pastAndFuture,
   casesAndPostpositions,
+  relativeClauses,
+  conditionalsSubjunctive,
+  passiveCausative,
+  reportedSpeech,
 ];
 
 export const grammarLevelLabels = {
   A1: "基础",
   A2: "进阶",
   B1: "深入",
+  B2: "精进",
 } as const;
 
 export const totalGrammarMinutes = grammarLessons.reduce(
@@ -55,7 +64,7 @@ export function getAdjacentLessons(id: string) {
   };
 }
 
-export const grammarLevelGroups = (["A1", "A2", "B1"] as const).map((level) => ({
+export const grammarLevelGroups = (["A1", "A2", "B1", "B2"] as const).map((level) => ({
   level,
   label: grammarLevelLabels[level],
   lessons: grammarLessons.filter((lesson) => lesson.level === level),

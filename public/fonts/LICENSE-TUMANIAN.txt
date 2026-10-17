@@ -1,0 +1,18 @@
+Hovhannes Tumanian's Handwriting
+================================
+
+Font family: HovhannesTumanian_U (ArTar_TumanianDzeragir_U)
+Copyright (c) 2005 Ruben Tarumian. All rights reserved.
+Source: https://tarumian.am/?p=2243
+Distributed by: https://fonter.am/en/fonts/tumanian-dzeragir
+
+License terms (as published by the author through fonter.am):
+- Free for personal and commercial use.
+- You may install it on your own machines, embed it in documents and designs,
+  and pass the file on as long as the author's name stays with it.
+- You may not sell the font file itself, rename it, claim the design as your
+  own, or modify it and pass the result off as the original font.
+
+Ayb redistributes the original TTF unmodified and a WOFF2 conversion for the
+web. The conversion changes only the container format, not the letterforms.
+The font is used as a decorative handwriting accent next to Noto Sans.

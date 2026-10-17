@@ -17,7 +17,7 @@ import { getGrammarProgressMap } from "@/lib/server/grammar";
 export const metadata: Metadata = {
   title: "语法",
   description:
-    "可实践的亚美尼亚语语法课：从字母、发音与人称，到名词、时态、格与后置词，每课都有例句和自测。",
+    "可实践的亚美尼亚语语法课：从字母、发音与人称，到名词、时态、格与后置词，再到关系从句、条件式与转述，每课都有例句和自测。",
 };
 
 export default async function GrammarPage() {
@@ -55,7 +55,7 @@ export default async function GrammarPage() {
               是一张地图。
             </h1>
             <p className="mt-5 max-w-[510px] text-[12px] leading-[1.95] text-[var(--muted)]">
-              从 38 个字母到格的变化，{lessons.length} 节短课，把规则放回具体的句子里。每节课都配有例句、对照表和一小组自测。
+              从 38 个字母到格的变化、关系从句与条件式，{lessons.length} 节短课，把规则放回具体的句子里。每节课都配有例句、对照表和一小组自测。
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Link
@@ -89,7 +89,7 @@ export default async function GrammarPage() {
                 约 {totalMinutes} 分钟
               </span>
               <span className="h-3 w-[1px] bg-[var(--line)]" />
-              <span>A1 → B1 · 循序渐进</span>
+              <span>A1 → B2 · 循序渐进</span>
             </div>
           </Reveal>
 
@@ -149,7 +149,7 @@ export default async function GrammarPage() {
         </div>
 
         <Reveal delay={0.12}>
-          <div className="hide-scrollbar mt-12 flex items-center gap-4 overflow-x-auto border-y border-[var(--line)] py-4">
+          <div className="glass-soft hide-scrollbar mt-12 flex items-center gap-4 overflow-x-auto rounded-[24px] px-5 py-4">
             <span className="eyebrow shrink-0">The alphabet · 38 տառ</span>
             <div className="flex items-center gap-1">
               {ARMENIAN_ALPHABET.map((letter) => (
@@ -199,7 +199,7 @@ export default async function GrammarPage() {
                 </span>
                 <span className="text-[11px] font-medium text-[var(--ink)]">{group.label}</span>
                 <span className="text-[9px] text-[var(--faint)]">
-                  {group.lessons.length} 节 · {group.level === "A1" ? "打好地基" : group.level === "A2" ? "把时间放进去" : "让名词移动"}
+                  {group.lessons.length} 节 · {group.level === "A1" ? "打好地基" : group.level === "A2" ? "把时间放进去" : group.level === "B1" ? "让名词移动" : "把句子连起来"}
                 </span>
                 <span className="ml-auto hidden font-mono text-[8px] text-[var(--faint)] sm:block">
                   {group.lessons.filter((lesson) => completedIds.has(lesson.id)).length} / {group.lessons.length} DONE
@@ -233,7 +233,7 @@ export default async function GrammarPage() {
                           <h3 className="text-[18px] font-medium tracking-[-0.02em] text-[var(--ink)] md:text-[21px]">
                             {lesson.title}
                           </h3>
-                          <span className="font-arm text-[10px] text-[var(--faint)] md:hidden" lang="hy">
+                          <span className="font-hand text-[18px] text-[var(--ink)] opacity-60 md:hidden" lang="hy">
                             {lesson.titleHy}
                           </span>
                           {completed && (
@@ -248,7 +248,7 @@ export default async function GrammarPage() {
                       </div>
 
                       <div className="flex items-center justify-between gap-3 md:block md:text-right">
-                        <p className="hidden font-display text-[19px] leading-tight text-[var(--muted)] md:block" lang="hy">
+                        <p className="hidden font-hand text-[25px] leading-tight text-[var(--ink)] opacity-60 md:block" lang="hy">
                           {lesson.titleHy}
                         </p>
                         <p className="mt-1 text-[8px] tracking-[0.06em] text-[var(--faint)]">

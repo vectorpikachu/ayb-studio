@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Compass, UserRound } from "lucide-react";
@@ -17,9 +18,19 @@ function isActive(pathname: string, href: string, match?: string) {
 
 export function SiteHeader({ user }: { user: SessionUser | null }) {
   const pathname = usePathname();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    function onScroll() {
+      setScrolled(window.scrollY > 14);
+    }
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
-    <header className="pointer-events-none fixed inset-x-0 top-0 z-50">
+    <header className={cn("site-header pointer-events-none fixed inset-x-0 top-0 z-50", scrolled && "is-scrolled")}>
       <div className="container-ayb flex h-[76px] items-center justify-between gap-4">
         <div className="pointer-events-auto">
           <Brand />
@@ -66,20 +77,20 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
             <>
               <Link
                 href="/login"
-                className="hidden h-9 items-center rounded-full border border-[var(--line)] bg-[var(--nav-bg)] px-4 text-[11px] font-semibold tracking-[0.04em] text-[var(--ink)] backdrop-blur-xl transition-colors hover:border-[var(--line-strong)] sm:inline-flex"
+                className="hidden h-9 items-center rounded-full border border-[var(--glass-edge)] bg-[var(--nav-bg)] px-4 text-[11px] font-semibold tracking-[0.04em] text-[var(--ink)] shadow-[inset_0_1px_0_var(--glass-inset)] backdrop-blur-xl transition-all hover:-translate-y-px hover:border-[var(--line-strong)] sm:inline-flex"
               >
                 登录
               </Link>
               <Link
                 href="/register"
-                className="hidden h-9 items-center rounded-full bg-[var(--ink)] px-4 text-[11px] font-semibold tracking-[0.04em] text-[var(--paper)] transition-colors hover:bg-[var(--accent)] hover:text-[#fff8ef] sm:inline-flex"
+                className="btn btn-primary hidden !min-h-9 !px-4 !text-[11px] sm:inline-flex"
               >
                 开始学习
               </Link>
               <Link
                 href="/login"
                 aria-label="登录 Ayb"
-                className="grid h-9 w-9 place-items-center rounded-full border border-[var(--line)] bg-[var(--nav-bg)] text-[var(--muted)] backdrop-blur-xl transition-colors hover:text-[var(--ink)] sm:hidden"
+                className="grid h-9 w-9 place-items-center rounded-full border border-[var(--glass-edge)] bg-[var(--nav-bg)] text-[var(--muted)] shadow-[inset_0_1px_0_var(--glass-inset)] backdrop-blur-xl transition-colors hover:text-[var(--ink)] sm:hidden"
               >
                 <UserRound size={15} strokeWidth={1.8} />
               </Link>

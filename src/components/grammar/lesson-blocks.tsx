@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 function ExampleCard({ example }: { example: GrammarExample }) {
   return (
-    <div className="group relative overflow-hidden rounded-[16px] border border-[var(--line)] bg-[var(--surface)] p-4 transition-colors hover:border-[var(--line-strong)] md:p-5">
+    <div className="glass-soft group relative overflow-hidden rounded-[20px] p-4 transition-all hover:-translate-y-0.5 md:p-5">
       <span className="absolute inset-y-5 left-0 w-[2px] rounded-r-full bg-[var(--accent)] opacity-60" />
       <div className="flex items-start justify-between gap-4 pl-3">
         <p className="font-arm text-[20px] leading-[1.55] text-[var(--ink)] md:text-[23px]" lang="hy">
@@ -44,7 +44,7 @@ export function GrammarBlocks({ blocks }: { blocks: GrammarBlock[] }) {
           return (
             <aside
               key={index}
-              className="my-6 flex gap-3.5 rounded-[16px] border border-[color-mix(in_srgb,var(--apricot)_30%,transparent)] bg-[color-mix(in_srgb,var(--apricot)_6%,transparent)] p-4 md:p-5"
+              className="my-6 flex gap-3.5 rounded-[20px] border border-[color-mix(in_srgb,var(--apricot)_30%,transparent)] bg-[color-mix(in_srgb,var(--apricot)_8%,transparent)] p-4 shadow-[inset_0_1px_0_var(--glass-inset)] backdrop-blur-xl md:p-5"
             >
               <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full border border-[color-mix(in_srgb,var(--apricot)_30%,transparent)] text-[var(--apricot)]">
                 <Lightbulb size={13} strokeWidth={1.8} />
@@ -77,7 +77,7 @@ export function GrammarBlocks({ blocks }: { blocks: GrammarBlock[] }) {
           return (
             <div key={index} className="my-6">
               {block.caption && <p className="eyebrow mb-2.5">{block.caption}</p>}
-              <div className="hide-scrollbar overflow-x-auto rounded-[16px] border border-[var(--line)] bg-[var(--surface)]">
+              <div className="hide-scrollbar glass-soft overflow-x-auto rounded-[20px]">
                 <table className="w-full min-w-[540px] border-collapse text-left">
                   <thead>
                     <tr className="border-b border-[var(--line)] bg-[color-mix(in_srgb,var(--surface-2)_42%,transparent)]">
@@ -135,24 +135,35 @@ export function GrammarBlocks({ blocks }: { blocks: GrammarBlock[] }) {
 
         if (block.type === "letters") {
           return (
-            <div key={index} className="my-6 grid grid-cols-4 gap-1.5 sm:grid-cols-6 xl:grid-cols-8">
-              {block.items.map((letter) => (
-                <div
-                  key={letter.upper}
-                  className="group rounded-[10px] border border-[var(--line)] bg-[var(--surface)] p-2.5 text-center transition-colors hover:border-[var(--line-strong)] hover:bg-[var(--surface-2)]"
-                >
-                  <p className="font-display text-[22px] leading-none text-[var(--ink)]" lang="hy">
-                    {letter.upper}
-                    <span className="ml-1 text-[17px] text-[var(--muted)]">{letter.lower}</span>
-                  </p>
-                  <p className="mt-2 truncate text-[8px] text-[var(--faint)]" lang="hy">
-                    {letter.name}
-                  </p>
-                  <p className="mt-0.5 truncate font-mono text-[8px] text-[var(--faint)]">
-                    {letter.sound}
-                  </p>
-                </div>
-              ))}
+            <div key={index} className="my-6">
+              <div className="mb-3 flex items-center justify-between text-[8px] font-semibold tracking-[0.15em] text-[var(--faint)]">
+                <span>PRINT · 印刷体</span>
+                <span className="font-hand text-[17px] font-normal tracking-normal text-[var(--accent)]" lang="hy">
+                  ձեռագիր · 手写体
+                </span>
+              </div>
+              <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-6 xl:grid-cols-8">
+                {block.items.map((letter) => (
+                  <div
+                    key={letter.upper}
+                    className="group rounded-[14px] border border-[var(--glass-edge)] bg-[var(--surface)] p-2.5 text-center shadow-[inset_0_1px_0_var(--glass-inset)] backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-[var(--surface-2)]"
+                  >
+                    <p className="font-display text-[22px] leading-none text-[var(--ink)]" lang="hy">
+                      {letter.upper}
+                      <span className="ml-1 text-[17px] text-[var(--muted)]">{letter.lower}</span>
+                    </p>
+                    <p className="mt-1.5 font-hand text-[19px] leading-none text-[var(--accent)]" lang="hy">
+                      {letter.lower}
+                    </p>
+                    <p className="mt-2 truncate text-[8px] text-[var(--faint)]" lang="hy">
+                      {letter.name}
+                    </p>
+                    <p className="mt-0.5 truncate font-mono text-[8px] text-[var(--faint)]">
+                      {letter.sound}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
           );
         }

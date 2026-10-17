@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-ui: var(--font-manrope), "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  --font-ui: var(--font-manrope), var(--font-armenian), "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
   --font-arm: var(--font-armenian), "Noto Sans Armenian", sans-serif;
   --font-display: var(--font-serif-armenian), "Noto Serif Armenian", Georgia, serif;
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;

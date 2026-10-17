@@ -98,7 +98,7 @@ const features = [
     title: "语法地图",
     en: "Grammar",
     description:
-      "从字母表到格变化，八节循序渐进的语法课。解释、对照表、例句与课后小测，完整而轻巧。",
+      "从字母表到格变化，九节循序渐进的语法课。解释、对照表、例句与课后小测，完整而轻巧。",
     href: "/grammar",
     icon: Hash,
     accent: "var(--azure)",

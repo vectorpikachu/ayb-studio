@@ -1,4 +1,5 @@
 import { getWordById, words } from "@/data/dictionary";
+import { grammarLessons } from "@/data/grammar";
 import type { ReviewOverview } from "@/lib/review-types";
 import type { Database } from "./db-types";
 import { readDatabase } from "./db";
@@ -38,6 +39,9 @@ export function buildLearnerOverview(database: Database, userId: string): Review
     (activity) => activity.type === "review" && dateKey(new Date(activity.at)) === todayKey,
   ).length;
 
+  const grammarProgress = database.grammarProgress[userId] ?? {};
+  const grammarCompleted = grammarLessons.filter((lesson) => Boolean(grammarProgress[lesson.id])).length;
+
   return {
     dueCount,
     newCount: Math.max(0, words.length - learnedCount),
@@ -46,7 +50,7 @@ export function buildLearnerOverview(database: Database, userId: string): Review
     streak,
     reviewedToday,
     totalReviews: activities.filter((activity) => activity.type === "review").length,
-    grammarCompleted: Object.keys(database.grammarProgress[userId] ?? {}).length,
+    grammarCompleted,
     writingCount: database.writings.filter((writing) => writing.userId === userId).length,
   };
 }

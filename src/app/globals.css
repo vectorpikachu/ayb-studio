@@ -298,6 +298,16 @@
   margin-bottom: 1.1em;
 }
 
+.writing-font {
+  font-family: var(--font-serif-armenian), "Songti SC", "Noto Serif SC", "STSong", "SimSun", serif;
+}
+
+.writing-paper {
+  background:
+    radial-gradient(ellipse at 82% 4%, rgba(232, 174, 116, 0.06), transparent 55%),
+    var(--elevated);
+}
+
 .hide-scrollbar {
   scrollbar-width: none;
 }

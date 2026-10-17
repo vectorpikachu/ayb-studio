@@ -17,9 +17,9 @@ const icons = {
 export function MobileDock() {
   const pathname = usePathname();
 
-  // Keep the review session immersive: the floating card and its rating
+  // Keep task-focused screens immersive: the floating card and writing
   // controls should never sit underneath the navigation dock.
-  if (pathname.startsWith("/review")) return null;
+  if (pathname.startsWith("/review") || pathname.startsWith("/write")) return null;
 
   return (
     <nav

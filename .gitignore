@@ -1,0 +1,30 @@
+# dependencies
+node_modules/
+.npm-cache/
+.npm/
+.pnpm-store/
+
+# next.js
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# local data & uploads (never commit learner data)
+.data/
+*.log
+
+# reference material used during design
+.ref/
+qa-output/
+
+# environment
+.env
+.env.*
+!.env.example
+
+# system / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

@@ -1,6 +1,8 @@
 import type { ReviewState } from "@/lib/srs";
 import type { DictionaryWord } from "@/data/dictionary/types";
 import type { GrammarLesson } from "@/data/grammar/types";
+import type { ReadingText } from "@/data/reading/types";
+import type { CultureEntry } from "@/data/culture/types";
 import type { UserRole } from "@/lib/auth-types";
 
 export type { ReviewGrade, ReviewState } from "@/lib/srs";
@@ -63,4 +65,6 @@ export type Database = {
   activities: ActivityRecord[];
   customWords: DictionaryWord[];
   customLessons: GrammarLesson[];
+  customReadingTexts: ReadingText[];
+  customCultureEntries: CultureEntry[];
 };

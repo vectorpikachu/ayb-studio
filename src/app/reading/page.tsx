@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight, BookOpenText, Clock3, Languages, Sparkles } from "lucide-react";
 import { Reveal } from "@/components/reveal";
-import { countArmenianWords, readingLevelLabels, readingTexts } from "@/data/reading";
+import { countArmenianWords, readingLevelLabels } from "@/data/reading";
+import { getContentReadingTexts } from "@/lib/server/content";
 
 export const metadata: Metadata = {
   title: "课文",
@@ -28,7 +29,8 @@ const readingSteps = [
   },
 ];
 
-export default function ReadingPage() {
+export default async function ReadingPage() {
+  const readingTexts = await getContentReadingTexts();
   const totalWords = readingTexts.reduce((total, text) => total + countArmenianWords(text), 0);
 
   return (
@@ -151,6 +153,14 @@ export default function ReadingPage() {
                       <p className="mt-3 max-w-[560px] text-[11px] leading-[1.9] text-[var(--muted)]">
                         {text.description}
                       </p>
+                      {text.author && (
+                        <p className="mt-2 text-[9px] tracking-[0.04em] text-[var(--faint)]">
+                          {text.author}
+                          {text.year && ` · ${text.year}`}
+                          {text.kind === "excerpt" && " · 选段"}
+                          {text.kind === "poem" && " · 诗"}
+                        </p>
+                      )}
                       <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[8px] tracking-[0.06em] text-[var(--faint)]">
                         <span className="flex items-center gap-1.5">
                           <Clock3 size={10} />

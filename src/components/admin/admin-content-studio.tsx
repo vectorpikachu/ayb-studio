@@ -246,6 +246,16 @@ export function AdminContentStudio({
           </div>
         </div>
 
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <Link href="/admin/library" className="btn btn-ghost !min-h-9 !px-4 !text-[10px]">
+            课文与文化库
+            <ArrowUpRight size={12} />
+          </Link>
+          <p className="text-[9px] text-[var(--faint)]">
+            在另一个编辑器中增删改课文、历史、文化、人物与地理条目。
+          </p>
+        </div>
+
         {showWelcome && (
           <div className="mt-6 flex items-start gap-3 rounded-[18px] border border-[color-mix(in_srgb,var(--sage)_32%,transparent)] bg-[color-mix(in_srgb,var(--sage)_7%,transparent)] px-4 py-3.5">
             <ShieldCheck size={16} className="mt-0.5 shrink-0 text-[var(--sage)]" />

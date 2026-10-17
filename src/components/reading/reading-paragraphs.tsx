@@ -84,6 +84,16 @@ export function ReadingParagraphs({ paragraphs }: { paragraphs: ReadingParagraph
                   <AudioButton text={paragraph.hy} label={`朗读第 ${index + 1} 段`} size="sm" />
                 </div>
               </div>
+              {paragraph.modernHy && (
+                <div className="mt-3 rounded-[14px] border border-[var(--line)] bg-[var(--surface)] px-3.5 py-3">
+                  <p className="text-[8px] font-semibold tracking-[0.14em] text-[var(--faint)]">
+                    MODERN · 现代亚美尼亚语
+                  </p>
+                  <p className="mt-1.5 font-arm text-[15px] leading-[1.75] text-[var(--muted)]" lang="hy">
+                    {paragraph.modernHy}
+                  </p>
+                </div>
+              )}
               {showZh && (
                 <p className="mt-2.5 border-l border-[var(--accent)] pl-3.5 text-[11px] leading-[1.9] text-[var(--muted)]">
                   {paragraph.zh}

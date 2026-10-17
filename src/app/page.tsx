@@ -571,10 +571,10 @@ export default async function HomePage() {
               <p className="font-hand text-[34px] leading-[1.45] tracking-[0.005em] text-[var(--ink)] md:text-[50px]">
                 Ես իմ անուշ Հայաստանի
                 <br />
-                արևահամ բարն եմ սիրում։
+                արևահամ բառն եմ սիրում։
               </p>
               <p className="mx-auto mt-7 max-w-[540px] text-[11px] leading-[1.9] text-[var(--muted)]">
-                我爱我甜蜜的亚美尼亚，那被阳光浸透的语言。
+                我爱我甜蜜的亚美尼亚，那被阳光浸透的词。
                 <span className="mt-1 block text-[10px] text-[var(--faint)]">
                   I love the sun-tasting word of my sweet Armenia.
                 </span>

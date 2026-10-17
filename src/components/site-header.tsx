@@ -38,7 +38,7 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
 
         <nav
           aria-label="主导航"
-          className="pill-nav pointer-events-auto absolute left-1/2 hidden -translate-x-1/2 md:flex"
+          className="pill-nav pointer-events-auto absolute left-1/2 hidden -translate-x-1/2 lg:flex"
         >
           <Link
             href="/"

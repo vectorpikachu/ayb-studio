@@ -11,6 +11,7 @@ export const navItems = [
   { href: "/review", label: "复习", match: "prefix" },
   { href: "/grammar", label: "语法", match: "prefix" },
   { href: "/reading", label: "课文", match: "prefix" },
+  { href: "/culture", label: "文化", match: "prefix" },
   { href: "/write", label: "写作", match: "prefix" },
 ] as const;
 
@@ -20,5 +21,6 @@ export const mobileNav = [
   { href: "/review", label: "复习", icon: "repeat", match: "prefix" },
   { href: "/grammar", label: "语法", icon: "blocks", match: "prefix" },
   { href: "/reading", label: "课文", icon: "reading", match: "prefix" },
+  { href: "/culture", label: "文化", icon: "culture", match: "prefix" },
   { href: "/write", label: "写作", icon: "pen", match: "prefix" },
 ] as const;

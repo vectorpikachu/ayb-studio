@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpenText, Blocks, BookOpen, Home, PenLine, Repeat2 } from "lucide-react";
+import { BookOpenText, Blocks, BookOpen, Home, Landmark, PenLine, Repeat2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { mobileNav } from "@/lib/constants";
 
@@ -12,6 +12,7 @@ const icons = {
   repeat: Repeat2,
   blocks: Blocks,
   reading: BookOpenText,
+  culture: Landmark,
   pen: PenLine,
 };
 
@@ -25,7 +26,7 @@ export function MobileDock() {
   return (
     <nav
       aria-label="移动端导航"
-      className="fixed inset-x-3 bottom-3 z-50 mx-auto flex max-w-[430px] items-center justify-around rounded-[24px] border border-[var(--glass-edge)] bg-[var(--nav-bg)] px-1.5 py-2 shadow-[0_24px_60px_-20px_var(--glass-shadow),inset_0_1px_0_var(--glass-inset)] backdrop-blur-2xl md:hidden"
+      className="fixed inset-x-3 bottom-3 z-50 mx-auto flex max-w-[430px] items-center justify-around rounded-[24px] border border-[var(--glass-edge)] bg-[var(--nav-bg)] px-1 py-2 shadow-[0_24px_60px_-20px_var(--glass-shadow),inset_0_1px_0_var(--glass-inset)] backdrop-blur-2xl lg:hidden"
     >
       {mobileNav.map((item) => {
         const Icon = icons[item.icon];
@@ -36,7 +37,7 @@ export function MobileDock() {
             key={item.href}
             href={item.href}
             className={cn(
-              "relative flex min-w-[54px] flex-col items-center gap-1 rounded-2xl py-1.5 text-[9px] font-medium tracking-wide transition-colors",
+              "relative flex min-w-[44px] flex-col items-center gap-0.5 rounded-2xl py-1.5 text-[8px] font-medium tracking-wide transition-colors",
               active ? "text-[var(--ink)]" : "text-[var(--faint)]",
             )}
           >

@@ -1,12 +1,17 @@
 import type { MetadataRoute } from "next";
-import { readingTexts } from "@/data/reading";
-import { getContentGrammarLessons } from "@/lib/server/content";
+import {
+  getContentCultureEntries,
+  getContentGrammarLessons,
+  getContentReadingTexts,
+} from "@/lib/server/content";
 import { getSiteUrl } from "@/lib/server/site-url";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [baseUrl, grammarLessons] = await Promise.all([
+  const [baseUrl, grammarLessons, readingTexts, cultureEntries] = await Promise.all([
     getSiteUrl(),
     getContentGrammarLessons(),
+    getContentReadingTexts(),
+    getContentCultureEntries(),
   ]);
   const now = new Date();
   return [
@@ -42,6 +47,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     ...readingTexts.map((text) => ({
       url: `${baseUrl}/reading/${text.id}`,
+      lastModified: now,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
+    {
+      url: `${baseUrl}/culture`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    ...cultureEntries.map((entry) => ({
+      url: `${baseUrl}/culture/${entry.id}`,
       lastModified: now,
       changeFrequency: "monthly" as const,
       priority: 0.7,

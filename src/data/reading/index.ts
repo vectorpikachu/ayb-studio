@@ -1,4 +1,6 @@
 import { myMorning } from "./01-my-morning";
+import { woundsOfArmenia } from "./02-wounds-of-armenia";
+import { charentsHayastani } from "./03-charents";
 import type { ReadingText } from "./types";
 
 export type {
@@ -9,7 +11,7 @@ export type {
   ReadingWord,
 } from "./types";
 
-export const readingTexts: ReadingText[] = [myMorning];
+export const readingTexts: ReadingText[] = [myMorning, woundsOfArmenia, charentsHayastani];
 
 export const readingLevelLabels = {
   A1: "基础",

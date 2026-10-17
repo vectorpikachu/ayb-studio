@@ -68,6 +68,8 @@ async function readDatabaseFile(): Promise<Database> {
 function normalizeDatabase(database: Database): Database {
   if (!Array.isArray(database.customWords)) database.customWords = [];
   if (!Array.isArray(database.customLessons)) database.customLessons = [];
+  if (!Array.isArray(database.customReadingTexts)) database.customReadingTexts = [];
+  if (!Array.isArray(database.customCultureEntries)) database.customCultureEntries = [];
 
   let hasAdmin = false;
   for (const user of database.users) {

@@ -12,25 +12,17 @@ import {
 } from "lucide-react";
 import { Handwriting } from "@/components/handwriting";
 import { ReadingParagraphs } from "@/components/reading/reading-paragraphs";
-import {
-  countArmenianWords,
-  getAdjacentReadingTexts,
-  getReadingText,
-  readingLevelLabels,
-  readingTexts,
-} from "@/data/reading";
+import { countArmenianWords, readingLevelLabels } from "@/data/reading";
+import { getContentReadingTexts } from "@/lib/server/content";
 
 type ReadingPageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export function generateStaticParams() {
-  return readingTexts.map((text) => ({ slug: text.id }));
-}
-
 export async function generateMetadata({ params }: ReadingPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const text = getReadingText(slug);
+  const texts = await getContentReadingTexts();
+  const text = texts.find((candidate) => candidate.id === slug);
   if (!text) return { title: "课文" };
   return {
     title: `${text.title} · 课文`,
@@ -40,12 +32,15 @@ export async function generateMetadata({ params }: ReadingPageProps): Promise<Me
 
 export default async function ReadingTextPage({ params }: ReadingPageProps) {
   const { slug } = await params;
-  const text = getReadingText(slug);
+  const texts = await getContentReadingTexts();
+  const text = texts.find((candidate) => candidate.id === slug);
   if (!text) notFound();
 
-  const index = readingTexts.findIndex((candidate) => candidate.id === text.id) + 1;
+  const index = texts.findIndex((candidate) => candidate.id === text.id) + 1;
   const words = countArmenianWords(text);
-  const { previous, next } = getAdjacentReadingTexts(text.id);
+  const textIndex = texts.findIndex((candidate) => candidate.id === text.id);
+  const previous = textIndex > 0 ? texts[textIndex - 1] : null;
+  const next = textIndex >= 0 && textIndex < texts.length - 1 ? texts[textIndex + 1] : null;
   const paragraphCount = text.paragraphs.length;
 
   return (
@@ -61,7 +56,7 @@ export default async function ReadingTextPage({ params }: ReadingPageProps) {
           </Link>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[9px] text-[var(--faint)]">
             <span className="font-mono">
-              TEXT {String(index).padStart(2, "0")} / {String(readingTexts.length).padStart(2, "0")}
+              TEXT {String(index).padStart(2, "0")} / {String(texts.length).padStart(2, "0")}
             </span>
             <span className="h-3 w-[1px] bg-[var(--line)]" />
             <span>
@@ -87,6 +82,14 @@ export default async function ReadingTextPage({ params }: ReadingPageProps) {
               <p className="mt-3 font-hand text-[34px] leading-[1.3] text-[var(--accent)] md:text-[42px]" lang="hy">
                 {text.titleHy}
               </p>
+              {text.author && (
+                <p className="mt-3 text-[10px] tracking-[0.04em] text-[var(--muted)]">
+                  {text.author}
+                  {text.year && <span className="text-[var(--faint)]"> · {text.year}</span>}
+                  {text.kind === "excerpt" && <span className="text-[var(--faint)]"> · 选段</span>}
+                  {text.kind === "poem" && <span className="text-[var(--faint)]"> · 诗</span>}
+                </p>
+              )}
               <p className="mt-4 max-w-[620px] text-[11px] leading-[1.9] text-[var(--muted)]">
                 {text.description}
               </p>
@@ -111,6 +114,24 @@ export default async function ReadingTextPage({ params }: ReadingPageProps) {
             <div className="surface-card overflow-hidden rounded-[28px]">
               <ReadingParagraphs paragraphs={text.paragraphs} />
             </div>
+            {text.source && (
+              <p className="mt-3 px-1 text-[9px] leading-[1.8] text-[var(--faint)]">
+                文本来源：{text.source}
+                {text.sourceUrl && (
+                  <>
+                    {" · "}
+                    <a
+                      href={text.sourceUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="underline decoration-[var(--line-strong)] underline-offset-2 transition-colors hover:text-[var(--ink)]"
+                    >
+                      Wikisource
+                    </a>
+                  </>
+                )}
+              </p>
+            )}
 
             <section className="mt-12" aria-labelledby="vocabulary">
               <div className="flex items-end justify-between gap-4 border-b border-[var(--line)] pb-3">

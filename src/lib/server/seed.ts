@@ -179,5 +179,7 @@ export async function buildSeedDatabase(): Promise<Database> {
     activities,
     customWords: [],
     customLessons: [],
+    customReadingTexts: [],
+    customCultureEntries: [],
   };
 }

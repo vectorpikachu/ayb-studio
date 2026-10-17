@@ -198,6 +198,126 @@ export const lessonsUploadSchema = z
 export type UploadWord = z.infer<typeof wordSchema>;
 export type UploadLesson = z.infer<typeof lessonSchema>;
 
+const readingParagraphSchema = z.object({
+  hy: shortText(4000),
+  zh: shortText(4000),
+  modernHy: optionalText(4000),
+  note: optionalText(2000),
+});
+
+const readingWordSchema = z.object({
+  hy: shortText(160),
+  translit: shortText(160),
+  zh: shortText(800),
+  note: optionalText(1200),
+});
+
+const readingGrammarPointSchema = z.object({
+  title: shortText(300),
+  explanation: shortText(4000),
+  examples: z
+    .array(
+      z.object({
+        hy: shortText(1000),
+        zh: shortText(2000),
+        note: optionalText(2000),
+      }),
+    )
+    .min(1)
+    .max(20),
+});
+
+const readingTextSchema = z.object({
+  id: idSchema,
+  order: z.number().int().min(1).max(999),
+  level: z.enum(["A1", "A2", "B1", "B2"]),
+  minutes: z.number().int().min(1).max(180),
+  title: shortText(300),
+  titleHy: shortText(300),
+  subtitle: shortText(400),
+  description: shortText(4000),
+  author: optionalText(300),
+  authorHy: optionalText(300),
+  year: optionalText(40),
+  kind: z.enum(["original", "excerpt", "poem"]).optional(),
+  source: optionalText(500),
+  sourceUrl: optionalText(1000),
+  paragraphs: z.array(readingParagraphSchema).min(1).max(40),
+  vocabulary: z.array(readingWordSchema).min(1).max(200),
+  grammarPoints: z.array(readingGrammarPointSchema).min(1).max(40),
+  takeaways: z.array(shortText(1000)).min(1).max(12),
+});
+
+export const readingUploadSchema = z
+  .union([
+    z.array(readingTextSchema).min(1).max(50),
+    z.object({ texts: z.array(readingTextSchema).min(1).max(50) }),
+  ])
+  .transform((payload) => (Array.isArray(payload) ? payload : payload.texts))
+  .superRefine((texts, ctx) => {
+    const ids = new Set<string>();
+    for (const text of texts) {
+      if (ids.has(text.id)) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: `课文 ID 重复：${text.id}` });
+      }
+      ids.add(text.id);
+    }
+  });
+
+const cultureSectionSchema = z.object({
+  id: idSchema,
+  heading: shortText(300),
+  paragraphs: z.array(shortText(6000)).min(1).max(20),
+});
+
+const cultureEntrySchema = z.object({
+  id: idSchema,
+  order: z.number().int().min(1).max(999),
+  category: z.enum(["history", "culture", "people", "geography"]),
+  title: shortText(300),
+  titleHy: shortText(300),
+  subtitle: shortText(400),
+  summary: shortText(4000),
+  sections: z.array(cultureSectionSchema).min(1).max(30),
+  facts: z
+    .array(
+      z.object({
+        label: shortText(200),
+        value: shortText(500),
+      }),
+    )
+    .max(10)
+    .optional(),
+  related: z
+    .array(
+      z.object({
+        href: z.string().trim().regex(/^\/(?!\/)/, "关联链接必须是站内路径。"),
+        label: shortText(200),
+      }),
+    )
+    .max(10)
+    .optional(),
+});
+
+export const cultureUploadSchema = z
+  .union([
+    z.array(cultureEntrySchema).min(1).max(100),
+    z.object({ entries: z.array(cultureEntrySchema).min(1).max(100) }),
+  ])
+  .transform((payload) => (Array.isArray(payload) ? payload : payload.entries))
+  .superRefine((entries, ctx) => {
+    const ids = new Set<string>();
+    for (const entry of entries) {
+      if (ids.has(entry.id)) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: `文化条目 ID 重复：${entry.id}` });
+      }
+      ids.add(entry.id);
+    }
+  });
+
+export type UploadReadingText = z.infer<typeof readingTextSchema>;
+export type UploadCultureEntry = z.infer<typeof cultureEntrySchema>;
+
 export function formatValidationErrors(error: z.ZodError): string {
   return error.issues
     .slice(0, 5)

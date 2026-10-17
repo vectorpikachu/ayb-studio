@@ -94,10 +94,21 @@ try {
   await page.getByRole("button", { name: "手写" }).click();
   assert.equal(await page.getByRole("button", { name: "手写" }).getAttribute("aria-pressed"), "true");
 
+  // Culture atlas and its detail page.
+  await page.goto(`${baseURL}/culture`, { waitUntil: "networkidle" });
+  await waitForText("不止一个入口");
+  await waitForText("亚拉拉特山");
+  await page.goto(`${baseURL}/culture/ararat`, { waitUntil: "networkidle" });
+  assert.ok((await page.locator("h1").innerText()).includes("亚拉拉特山"));
+  await waitForText("大亚拉拉特");
+
   // Admin onboarding, template download, JSON upload, and delete.
   await page.goto(`${baseURL}/admin?welcome=1`, { waitUntil: "networkidle" });
   await waitForText("内容管理。");
   await waitForText("你已经是这个实例的管理员。");
+  await page.goto(`${baseURL}/admin/library`, { waitUntil: "networkidle" });
+  await waitForText("课文与文化。");
+  await page.goto(`${baseURL}/admin`, { waitUntil: "networkidle" });
   const templateHref = await page
     .getByRole("link", { name: "下载模板" })
     .first()

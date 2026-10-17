@@ -4,6 +4,10 @@ import {
   grammarLevelLabels,
   type GrammarLesson,
 } from "@/data/grammar";
+import { readingTexts as baseReadingTexts } from "@/data/reading";
+import type { ReadingText } from "@/data/reading/types";
+import { cultureEntries as baseCultureEntries } from "@/data/culture";
+import type { CultureEntry } from "@/data/culture/types";
 import { mergeById } from "@/lib/content-utils";
 import { readDatabase } from "./db";
 
@@ -43,4 +47,28 @@ export function findAdjacentLessons(lessons: GrammarLesson[], id: string) {
     previous: index > 0 ? lessons[index - 1] : null,
     next: index >= 0 && index < lessons.length - 1 ? lessons[index + 1] : null,
   };
+}
+
+export async function getContentReadingTexts(): Promise<ReadingText[]> {
+  const database = await readDatabase();
+  return mergeById(baseReadingTexts, database.customReadingTexts).sort(
+    (left, right) => left.order - right.order,
+  );
+}
+
+export async function getContentReadingText(id: string): Promise<ReadingText | undefined> {
+  const texts = await getContentReadingTexts();
+  return texts.find((text) => text.id === id);
+}
+
+export async function getContentCultureEntries(): Promise<CultureEntry[]> {
+  const database = await readDatabase();
+  return mergeById(baseCultureEntries, database.customCultureEntries).sort(
+    (left, right) => left.order - right.order,
+  );
+}
+
+export async function getContentCultureEntry(id: string): Promise<CultureEntry | undefined> {
+  const entries = await getContentCultureEntries();
+  return entries.find((entry) => entry.id === id);
 }

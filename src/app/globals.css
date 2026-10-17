@@ -302,6 +302,10 @@
   font-family: var(--font-serif-armenian), "Songti SC", "Noto Serif SC", "STSong", "SimSun", serif;
 }
 
+.word-fit-container {
+  container-type: inline-size;
+}
+
 .writing-paper {
   background:
     radial-gradient(ellipse at 82% 4%, rgba(232, 174, 116, 0.06), transparent 55%),

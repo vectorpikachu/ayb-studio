@@ -19,6 +19,7 @@ import {
   Zap,
 } from "lucide-react";
 import { AudioButton } from "@/components/audio-button";
+import { ArmenianWord } from "@/components/armenian-word";
 import {
   categoryMap,
   getWordById,
@@ -500,7 +501,7 @@ export function ReviewStudio({
                       </div>
                     </div>
 
-                    <div className="relative flex flex-1 flex-col px-5 py-7 md:px-10 md:py-9">
+                    <div className="word-fit-container relative flex flex-1 flex-col px-5 py-7 md:px-10 md:py-9">
                       <AnimatePresence mode="wait" initial={false}>
                         {!flipped ? (
                           <motion.div
@@ -513,17 +514,10 @@ export function ReviewStudio({
                           >
                             <span className="eyebrow">这个词语是什么意思？</span>
                             <h2
-                              className={cn(
-                                "mt-7 max-w-full break-words font-display leading-[0.95] tracking-[-0.02em] text-[var(--ink)]",
-                                Array.from(word.hy).length > 13
-                                  ? "text-[clamp(38px,6.6vw,68px)]"
-                                  : Array.from(word.hy).length > 9
-                                    ? "text-[clamp(48px,7.2vw,86px)]"
-                                    : "text-[clamp(64px,8.2vw,108px)]",
-                              )}
+                              className="mt-7 w-full font-display tracking-[-0.02em] text-[var(--ink)]"
                               lang="hy"
                             >
-                              {word.hy}
+                              <ArmenianWord text={word.hy} max={112} min={30} className="text-center" />
                             </h2>
                             <p className="mt-4 text-[11px] tracking-[0.06em] text-[var(--faint)]">
                               {word.translit}

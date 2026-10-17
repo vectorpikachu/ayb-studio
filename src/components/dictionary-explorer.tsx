@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { AudioButton } from "@/components/audio-button";
+import { ArmenianWord } from "@/components/armenian-word";
 import { Reveal } from "@/components/reveal";
 import {
   ARMENIAN_ALPHABET,
@@ -380,7 +381,7 @@ export function DictionaryExplorer() {
                   key={word.id}
                   type="button"
                   onClick={() => setSelectedWord(word)}
-                  className="surface-card group relative overflow-hidden rounded-[20px] p-5 text-left transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:border-[var(--line-strong)] hover:shadow-[0_18px_40px_rgba(0,0,0,.1)] md:p-6"
+                  className="surface-card word-fit-container group relative overflow-hidden rounded-[20px] p-5 text-left transition-all duration-300 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:border-[var(--line-strong)] hover:shadow-[0_18px_40px_rgba(0,0,0,.1)] md:p-6"
                   aria-label={`查看词条 ${word.hy}`}
                 >
                   <span
@@ -393,12 +394,12 @@ export function DictionaryExplorer() {
                   </span>
 
                   <div className="flex items-start justify-between gap-4 pr-7">
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <p
-                        className="font-display text-[clamp(29px,3.2vw,39px)] leading-[1.08] tracking-[-0.015em] text-[var(--ink)]"
+                        className="font-display tracking-[-0.015em] text-[var(--ink)]"
                         lang="hy"
                       >
-                        {word.hy}
+                        <ArmenianWord text={word.hy} max={39} min={23} />
                       </p>
                       <div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[9px] text-[var(--faint)]">
                         <span className="tracking-[0.05em]">{word.translit}</span>
@@ -545,29 +546,26 @@ export function DictionaryExplorer() {
                   </button>
                 </div>
 
-                <div className="px-6 pb-8 pt-7 md:px-8 md:pb-10">
-                  <div className="flex flex-wrap items-start justify-between gap-5">
-                    <div>
-                      <h2
-                        id="word-dialog-title"
-                        className="font-display text-[54px] leading-[0.95] tracking-[-0.01em] text-[var(--ink)] md:text-[68px]"
-                        lang="hy"
-                      >
-                        {selectedWord.hy}
-                      </h2>
-                      <p className="mt-3 text-[11px] tracking-[0.05em] text-[var(--faint)]">
-                        {selectedWord.translit}
-                        <span className="mx-2 opacity-50">·</span>
-                        {posLabels[selectedWord.pos]}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="rounded-full border border-[var(--line)] px-3 py-1.5 text-[8px] font-semibold tracking-[0.1em] text-[var(--muted)]">
-                        {selectedWord.level} · {levelLabels[selectedWord.level]}
-                      </span>
-                      <AudioButton text={selectedWord.hy} label="朗读词条" />
-                    </div>
+                <div className="word-fit-container px-6 pb-8 pt-6 md:px-8 md:pb-10">
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="rounded-full border border-[var(--line)] px-3 py-1.5 text-[8px] font-semibold tracking-[0.1em] text-[var(--muted)]">
+                      {selectedWord.level} · {levelLabels[selectedWord.level]}
+                    </span>
+                    <AudioButton text={selectedWord.hy} label="朗读词条" />
                   </div>
+
+                  <h2
+                    id="word-dialog-title"
+                    className="mt-5 font-display tracking-[-0.01em] text-[var(--ink)]"
+                    lang="hy"
+                  >
+                    <ArmenianWord text={selectedWord.hy} max={68} min={30} />
+                  </h2>
+                  <p className="mt-3 text-[11px] tracking-[0.05em] text-[var(--faint)]">
+                    {selectedWord.translit}
+                    <span className="mx-2 opacity-50">·</span>
+                    {posLabels[selectedWord.pos]}
+                  </p>
 
                   <div className="mt-7 grid gap-0 rounded-[16px] border border-[var(--line)] bg-[var(--surface)] px-5">
                     {[

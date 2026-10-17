@@ -10,6 +10,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { AudioButton } from "@/components/audio-button";
+import { ArmenianWord } from "@/components/armenian-word";
 import { Reveal } from "@/components/reveal";
 import { getWordOfTheDay, posLabels } from "@/data/dictionary";
 import { grammarLessons } from "@/data/grammar";
@@ -304,10 +305,12 @@ export default async function HomePage() {
                 </div>
 
                 <div className="mt-8 flex items-end gap-5">
-                  <p className="font-display text-[72px] leading-[0.8] tracking-[-0.02em] text-[var(--ink)] md:text-[94px]">
-                    {word.hy}
-                  </p>
-                  <div className="mb-1">
+                  <div className="word-fit-container min-w-0 flex-1">
+                    <p className="font-display tracking-[-0.02em] text-[var(--ink)]">
+                      <ArmenianWord text={word.hy} max={94} min={42} />
+                    </p>
+                  </div>
+                  <div className="mb-1 shrink-0">
                     <p className="text-[11px] tracking-[0.08em] text-[var(--faint)]">
                       {word.translit}
                     </p>

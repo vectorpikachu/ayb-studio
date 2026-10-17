@@ -4,8 +4,8 @@
   "description": "从一个字母开始，学会亚美尼亚语。",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0e0d0c",
-  "theme_color": "#0e0d0c",
+  "background_color": "#f4f0e7",
+  "theme_color": "#f4f0e7",
   "lang": "zh-CN",
   "icons": [
     {

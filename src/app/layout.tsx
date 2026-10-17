@@ -52,7 +52,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     title: "Ayb",
-    statusBarStyle: "black-translucent",
+    statusBarStyle: "default",
   },
   openGraph: {
     title: "Ayb · 亚美尼亚语学习室",
@@ -65,20 +65,17 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#0e0d0c" },
-    { media: "(prefers-color-scheme: light)", color: "#f4f0e7" },
-  ],
+  themeColor: "#f4f0e7",
 };
 
 const themeScript = `
 (function () {
   try {
     var t = localStorage.getItem('ayb-theme');
-    if (t !== 'light' && t !== 'dark') t = 'dark';
+    if (t !== 'light' && t !== 'dark') t = 'light';
     document.documentElement.dataset.theme = t;
   } catch (e) {
-    document.documentElement.dataset.theme = 'dark';
+    document.documentElement.dataset.theme = 'light';
   }
 })();
 `;
@@ -89,7 +86,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html
       lang="zh-CN"
-      data-theme="dark"
+      data-theme="light"
       suppressHydrationWarning
       className={`${manrope.variable} ${armenianSans.variable} ${armenianSerif.variable}`}
     >

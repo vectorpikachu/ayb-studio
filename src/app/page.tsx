@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { AudioButton } from "@/components/audio-button";
 import { Reveal } from "@/components/reveal";
-import { getWordOfTheDay } from "@/data/featured";
+import { getWordOfTheDay, posLabels } from "@/data/dictionary";
 
 const features = [
   {
@@ -263,7 +263,7 @@ export default function HomePage() {
                     </h2>
                   </div>
                   <span className="rounded-full border border-[var(--line)] px-2.5 py-1 text-[8px] font-semibold tracking-[0.12em] text-[var(--faint)]">
-                    {word.level} · {word.pos.split(" · ")[0]}
+                    {word.level} · {posLabels[word.pos]}
                   </span>
                 </div>
 
@@ -315,9 +315,6 @@ export default function HomePage() {
                     </p>
                     <p className="text-[10px] leading-relaxed text-[var(--faint)]">
                       {word.example.en}
-                    </p>
-                    <p className="text-[10px] leading-relaxed text-[var(--faint)]">
-                      {word.example.ru}
                     </p>
                   </div>
                 </div>

@@ -1,0 +1,153 @@
+import type { DictionaryCategory, PartOfSpeech } from "./types";
+
+export const dictionaryCategories: DictionaryCategory[] = [
+  {
+    id: "essentials",
+    label: "日常用语",
+    en: "Essentials",
+    hy: "Ամենօրյա",
+    description: "问候、感谢，以及最常用的疑问词。",
+    accent: "var(--accent)",
+  },
+  {
+    id: "people",
+    label: "人与家人",
+    en: "People",
+    hy: "Մարդիկ",
+    description: "家人、朋友，以及我们如何称呼彼此。",
+    accent: "var(--apricot)",
+  },
+  {
+    id: "food",
+    label: "饮食",
+    en: "Food & drink",
+    hy: "Սեղան",
+    description: "从面包与水，到石榴和杏子。",
+    accent: "color-mix(in srgb, var(--accent) 55%, var(--apricot))",
+  },
+  {
+    id: "nature",
+    label: "自然",
+    en: "Nature",
+    hy: "Բնություն",
+    description: "太阳、山与风，亚美尼亚的辽阔。",
+    accent: "var(--sage)",
+  },
+  {
+    id: "places",
+    label: "城市与场所",
+    en: "Places",
+    hy: "Քաղաք",
+    description: "家附近的日常，以及更远的地方。",
+    accent: "var(--azure)",
+  },
+  {
+    id: "body",
+    label: "身体与健康",
+    en: "Body & health",
+    hy: "Մարմին",
+    description: "描述身体，也照顾好自己的健康。",
+    accent: "color-mix(in srgb, var(--accent) 45%, var(--azure))",
+  },
+  {
+    id: "time",
+    label: "时间与数字",
+    en: "Time & numbers",
+    hy: "Ժամանակ",
+    description: "今天、明天，以及数到十。",
+    accent: "color-mix(in srgb, var(--apricot) 62%, var(--azure))",
+  },
+  {
+    id: "description",
+    label: "颜色与形容",
+    en: "Description",
+    hy: "Նկարագրություն",
+    description: "让一句话拥有颜色、温度与尺度。",
+    accent: "color-mix(in srgb, var(--apricot) 70%, var(--accent))",
+  },
+  {
+    id: "actions",
+    label: "动作与动词",
+    en: "Actions",
+    hy: "Բայեր",
+    description: "去、来、读、写，让语言开始移动。",
+    accent: "var(--accent)",
+  },
+  {
+    id: "culture",
+    label: "旅行与文化",
+    en: "Travel & culture",
+    hy: "Մշակույթ",
+    description: "路、书、音乐，以及亚美尼亚语本身。",
+    accent: "color-mix(in srgb, var(--azure) 68%, var(--sage))",
+  },
+];
+
+export const categoryMap = Object.fromEntries(
+  dictionaryCategories.map((category) => [category.id, category]),
+) as Record<DictionaryCategory["id"], DictionaryCategory>;
+
+export const posLabels: Record<PartOfSpeech, string> = {
+  noun: "名词",
+  verb: "动词",
+  adjective: "形容词",
+  adverb: "副词",
+  phrase: "短语",
+  pronoun: "代词",
+  interjection: "感叹词",
+  numeral: "数词",
+  particle: "小品词",
+};
+
+export const levelLabels = {
+  A1: "入门",
+  A2: "基础",
+  B1: "进阶",
+} as const;
+
+export const ARMENIAN_ALPHABET = [
+  "Ա",
+  "Բ",
+  "Գ",
+  "Դ",
+  "Ե",
+  "Զ",
+  "Է",
+  "Ը",
+  "Թ",
+  "Ժ",
+  "Ի",
+  "Լ",
+  "Խ",
+  "Ծ",
+  "Կ",
+  "Հ",
+  "Ձ",
+  "Ղ",
+  "Ճ",
+  "Մ",
+  "Յ",
+  "Ն",
+  "Շ",
+  "Ո",
+  "Չ",
+  "Պ",
+  "Ջ",
+  "Ռ",
+  "Ս",
+  "Վ",
+  "Տ",
+  "Ր",
+  "Ց",
+  "ՈՒ",
+  "Փ",
+  "Ք",
+  "Օ",
+  "Ֆ",
+] as const;
+
+export const pronounLabels = {
+  en: "EN",
+  ru: "RU",
+  zh: "中",
+} as const;

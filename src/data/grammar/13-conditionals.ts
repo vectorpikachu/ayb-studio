@@ -2,7 +2,7 @@ import type { GrammarLesson } from "./types";
 
 export const conditionalsSubjunctive: GrammarLesson = {
   id: "conditionals-subjunctive",
-  order: 11,
+  order: 13,
   level: "B2",
   minutes: 15,
   title: "条件与虚拟：如果，就会",

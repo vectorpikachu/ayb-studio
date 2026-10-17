@@ -2,7 +2,7 @@ import type { GrammarLesson } from "./types";
 
 export const relativeClauses: GrammarLesson = {
   id: "relative-clauses",
-  order: 10,
+  order: 12,
   level: "B2",
   minutes: 14,
   title: "关系从句：把两句话缝在一起",
@@ -51,7 +51,7 @@ export const relativeClauses: GrammarLesson = {
       blocks: [
         {
           type: "paragraph",
-          text: "指人、指地点、指时间时，亚美尼亚语还有一组更具体的关系词。它们本身不再变格，读起来也更轻。ինչու、ինչպես、որքան 更常出现在间接疑问里，第 13 课会专门讲。",
+          text: "指人、指地点、指时间时，亚美尼亚语还有一组更具体的关系词。它们本身不再变格，读起来也更轻。ինչու、ինչպես、որքան 更常出现在间接疑问里，第 15 课会专门讲。",
         },
         {
           type: "table",

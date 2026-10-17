@@ -2,7 +2,7 @@ import type { GrammarLesson } from "./types";
 
 export const reportedSpeech: GrammarLesson = {
   id: "reported-speech",
-  order: 13,
+  order: 15,
   level: "B2",
   minutes: 13,
   title: "转述与传闻：谁说的？",

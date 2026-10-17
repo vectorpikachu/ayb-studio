@@ -55,7 +55,7 @@ export default async function GrammarPage() {
               是一张地图。
             </h1>
             <p className="mt-5 max-w-[510px] text-[12px] leading-[1.95] text-[var(--muted)]">
-              从 38 个字母到格的变化、关系从句与条件式，{lessons.length} 节短课，把规则放回具体的句子里。每节课都配有例句、对照表和一小组自测。
+              从 38 个字母到七个格、关系从句与条件式，{lessons.length} 节短课，把规则放回具体的句子里。每节课都配有例句、对照表和一小组自测。
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Link

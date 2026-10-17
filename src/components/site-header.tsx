@@ -57,7 +57,7 @@ export function SiteHeader({ user }: { user: SessionUser | null }) {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "relative rounded-full px-4 py-2 text-[12px] font-medium tracking-[0.04em] transition-colors",
+                  "relative rounded-full px-3 py-2 text-[11px] font-medium tracking-[0.04em] transition-colors lg:px-4 lg:text-[12px]",
                   active
                     ? "bg-[var(--surface-2)] text-[var(--ink)]"
                     : "text-[var(--muted)] hover:text-[var(--ink)]",

@@ -6,6 +6,7 @@ const learningLinks = [
   { href: "/dictionary", label: "词典" },
   { href: "/review", label: "复习" },
   { href: "/grammar", label: "语法" },
+  { href: "/reading", label: "课文" },
   { href: "/write", label: "写作" },
 ];
 

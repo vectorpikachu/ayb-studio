@@ -7,10 +7,12 @@ import { questionsNegation } from "./06-questions";
 import { numbersAdjectivesTime } from "./07-numbers";
 import { pastAndFuture } from "./08-past-future";
 import { casesAndPostpositions } from "./09-cases";
-import { relativeClauses } from "./10-relative-clauses";
-import { conditionalsSubjunctive } from "./11-conditionals";
-import { passiveCausative } from "./12-passive-causative";
-import { reportedSpeech } from "./13-reported-speech";
+import { sevenCases } from "./10-seven-cases";
+import { caseStems } from "./11-case-stems";
+import { relativeClauses } from "./12-relative-clauses";
+import { conditionalsSubjunctive } from "./13-conditionals";
+import { passiveCausative } from "./14-passive-causative";
+import { reportedSpeech } from "./15-reported-speech";
 import type { GrammarLesson } from "./types";
 
 export type {
@@ -32,6 +34,8 @@ export const grammarLessons: GrammarLesson[] = [
   numbersAdjectivesTime,
   pastAndFuture,
   casesAndPostpositions,
+  sevenCases,
+  caseStems,
   relativeClauses,
   conditionalsSubjunctive,
   passiveCausative,

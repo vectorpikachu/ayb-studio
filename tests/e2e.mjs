@@ -84,6 +84,16 @@ try {
   assert.ok((await page.locator("h1").innerText()).includes("是"));
   await page.getByText(/题小测/).first().waitFor({ timeout: 10_000 });
 
+  // Reading: text list, text detail, vocabulary, and the print/hand switch.
+  await page.goto(`${baseURL}/reading`, { waitUntil: "networkidle" });
+  await waitForText("我的早晨");
+  await page.goto(`${baseURL}/reading/my-morning`, { waitUntil: "networkidle" });
+  assert.ok((await page.locator("h1").innerText()).includes("我的早晨"));
+  await waitForText("生词");
+  await waitForText("语法点");
+  await page.getByRole("button", { name: "手写" }).click();
+  assert.equal(await page.getByRole("button", { name: "手写" }).getAttribute("aria-pressed"), "true");
+
   // Admin onboarding, template download, JSON upload, and delete.
   await page.goto(`${baseURL}/admin?welcome=1`, { waitUntil: "networkidle" });
   await waitForText("内容管理。");
@@ -128,7 +138,7 @@ try {
   await page.goto(`${baseURL}/admin`, { waitUntil: "networkidle" });
   await page.getByRole("button", { name: `删除词条 ${adminWord.hy}` }).click();
   await page.getByRole("button", { name: "确认", exact: true }).click();
-  await page.waitForTimeout(900);
+  await page.waitForTimeout(1500);
 
   await page.goto(`${baseURL}/dictionary`, { waitUntil: "networkidle" });
   await search.fill(adminWord.hy);

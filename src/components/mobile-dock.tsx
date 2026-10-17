@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Blocks, BookOpen, Home, PenLine, Repeat2 } from "lucide-react";
+import { BookOpenText, Blocks, BookOpen, Home, PenLine, Repeat2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { mobileNav } from "@/lib/constants";
 
@@ -11,6 +11,7 @@ const icons = {
   book: BookOpen,
   repeat: Repeat2,
   blocks: Blocks,
+  reading: BookOpenText,
   pen: PenLine,
 };
 

@@ -4,6 +4,7 @@ import {
   ArrowRight,
   ArrowUpRight,
   BookOpen,
+  BookOpenText,
   Feather,
   Hash,
   Layers,
@@ -103,7 +104,7 @@ const features = [
     title: "语法地图",
     en: "Grammar",
     description:
-      "从字母表到关系从句，十三节循序渐进的语法课。解释、对照表、例句与课后小测，完整而轻巧。",
+      "从字母表到七个格与关系从句，十五节循序渐进的语法课。解释、对照表、例句与课后小测，完整而轻巧。",
     href: "/grammar",
     icon: Hash,
     accent: "var(--azure)",
@@ -459,6 +460,34 @@ export default async function HomePage() {
             );
           })}
         </div>
+
+        <Reveal>
+          <Link
+            href="/reading"
+            className="glass group mt-4 flex flex-col gap-4 rounded-[24px] p-5 transition-all duration-500 ease-[var(--ease-out-expo)] hover:-translate-y-0.5 hover:shadow-[0_28px_60px_-30px_var(--glass-shadow)] sm:flex-row sm:items-center md:p-6"
+          >
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-[var(--line)] text-[var(--accent)]">
+              <BookOpenText size={16} strokeWidth={1.7} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-[8px] font-semibold tracking-[0.16em] text-[var(--faint)]">
+                READING · 课文
+              </p>
+              <p className="mt-1 text-[15px] font-medium tracking-[-0.02em] text-[var(--ink)]">
+                把学过的词，放回一整段里。
+              </p>
+              <p className="mt-1 text-[10px] leading-[1.8] text-[var(--muted)]">
+                带中文对照、生词表、语法点和朗读；从 A2 的第一篇开始。
+              </p>
+            </div>
+            <span className="inline-flex shrink-0 items-center gap-2 text-[10px] font-semibold text-[var(--ink)]">
+              阅读第一课
+              <span className="grid h-6 w-6 place-items-center rounded-full border border-[var(--line)] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:border-[var(--accent)] group-hover:text-[var(--accent)]">
+                <ArrowRight size={11} />
+              </span>
+            </span>
+          </Link>
+        </Reveal>
       </section>
 
       <section className="container-ayb mt-24 md:mt-32">

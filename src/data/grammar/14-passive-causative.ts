@@ -2,7 +2,7 @@ import type { GrammarLesson } from "./types";
 
 export const passiveCausative: GrammarLesson = {
   id: "passive-causative",
-  order: 12,
+  order: 14,
   level: "B2",
   minutes: 14,
   title: "被动与使役：事情被做，还是让人去做",

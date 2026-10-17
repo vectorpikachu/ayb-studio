@@ -1,21 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "standalone",
   poweredByHeader: false,
   reactStrictMode: true,
   experimental: {
     optimizePackageImports: ["lucide-react", "motion"],
-  },
-  outputFileTracingExcludes: {
-    "*": [
-      ".data/**/*",
-      ".ref/**/*",
-      "qa-output/**/*",
-      "release/**/*",
-      "electron/**/*",
-      "scripts/**/*",
-    ],
   },
   async headers() {
     return [

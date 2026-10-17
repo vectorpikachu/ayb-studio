@@ -34,7 +34,6 @@ Ayb 是一个可运行、可注册、按用户保存进度的亚美尼亚语学�
 - **私人写作室**：创建、编辑、删除文章；草稿 / 完成状态；自动保存与 `Ctrl/⌘ + S`；中文对照；最多 8 个标签；预览；导出 `.txt`。
 - **账户系统**：注册、登录、退出、演示账号、HttpOnly 会话、30 天有效；每个用户的数据完全隔离。
 - **内容管理**：`/admin` 提供词典与语法 JSON 的批量导入、覆盖和删除；开发环境的演示账号是管理员，生产环境由首个注册账号或 `AYB_ADMIN_EMAIL` 指定管理员。
-- **桌面应用**：Electron 外壳会启动内置的 Next.js 生产服务，数据保存在系统用户目录；支持 Windows NSIS 安装包与 macOS DMG 构建。
 - **夜间 / 日间主题**、响应式布局、PWA manifest 与图标、自定义 404。
 - **零外部服务**：不需要数据库服务器、邮箱服务或第三方 API；本地 JSON 持久化，开箱即用。
 
@@ -70,14 +69,22 @@ AYB_ENABLE_DEMO=true
 
 > 演示账户只会在数据库首次创建时播种。若数据库已经存在，再打开开关不会生成新账户；请使用全新数据目录，或手动删除 `.data`（会清空所有数据）。
 
-## 生产构建
+## 部署成网站
+
+这是一个完整的 Next.js 网站（服务端 API、登录、JSON 数据库），需要一个 Node.js 进程，不能直接导出成纯静态 HTML。
 
 ```bash
 npm run build
 npm start
 ```
 
-> 项目使用 `output: standalone` 以便容器部署，因此 `next start` 会打印一条建议使用 standalone server 的提示；本地预览仍可正常运行。生产环境推荐使用下方 Docker 方式。
+打开 <http://localhost:3000>。生产环境建议：
+
+1. 把 `NEXT_PUBLIC_SITE_URL` 改成真实域名；
+2. 用 Nginx / Caddy 反向代理到 `127.0.0.1:3000` 并配置 HTTPS；
+3. 保持 `AYB_ENABLE_DEMO=false`；
+4. 用 systemd / PM2 等让 `npm start` 常驻；
+5. 定期备份 `.data/ayb.db.json`。
 
 数据默认存放在项目根目录的 `.data/ayb.db.json`。该目录已被 `.gitignore` 排除，**不要提交真实用户数据**。
 
@@ -88,62 +95,19 @@ npm start
 cp .data/ayb.db.json backups/ayb-$(date +%F).json
 ```
 
+> 不需要 Docker，也不需要 Electron / exe。当前版本依赖服务端 API 和本地 JSON 持久化，所以不能直接 `next export` 成纯静态站点；如果要的是“只读词典 + 语法”的静态页面（不带登录和进度保存），那是另一种更简单的形态，可以另外拆。
+
 ### 环境变量
 
 | 变量 | 默认值 | 说明 |
 | --- | --- | --- |
 | `NEXT_PUBLIC_SITE_URL` | `http://localhost:3000` | 站点公开 URL，用于 metadata、sitemap。 |
-| `AYB_DATA_DIR` | `./.data` | JSON 数据库目录。Docker 中建议 `/data`。 |
+| `AYB_DATA_DIR` | `./.data` | JSON 数据库目录；生产环境建议用绝对路径，如 `/srv/ayb/data`。 |
 | `AYB_ENABLE_DEMO` | 非生产为 `true` | 是否播种并允许演示账号。生产建议关闭。 |
 | `AYB_ADMIN_EMAIL` | 空 | 指定管理员邮箱；该邮箱注册后获得管理员权限。未设置时，数据库中首个注册账号成为管理员。 |
 | `AYB_TIMEZONE` | 服务器本地时区 | 连续学习日历使用的 IANA 时区，如 `Asia/Shanghai`。 |
 
 复制 `.env.example` 作为起点。该文件不包含任何密钥。
-
-### Docker
-
-```bash
-docker compose up -d --build
-```
-
-> Docker 是可选的：本地开发和预览只需要 Node.js。容器方式适合部署到 VPS / NAS；容器使用独立的数据卷，不会读取项目里的 `.data`。
->
-> Windows 上的 Docker Desktop 需要 WSL2。Windows 家庭版不能使用 Hyper-V 后端；如果 Docker 提示 “WSL not installed”，请以管理员身份运行 `wsl --install`，重启后再执行 `docker compose up -d --build`。
-
-打开 <http://localhost:3000>。数据库存储在命名卷 `ayb_data` 中，容器重建不会丢失。生产部署请：
-
-1. 把 `NEXT_PUBLIC_SITE_URL` 改成真实域名；
-2. 用 Nginx/Caddy 配置 HTTPS；
-3. 保持 `AYB_ENABLE_DEMO=false`；
-4. 定期备份 `ayb_data` 卷；
-5. 在反向代理层为登录接口配置共享限流。
-
-### 桌面应用（Electron）
-
-桌面版不依赖 Docker，也不要求用户安装 Node.js。Electron 主进程会在随机本地端口启动打包后的 Next.js standalone 服务，然后加载 `http://127.0.0.1:<port>`。
-
-```bash
-# 开发：自动启动 Next dev + Electron
-npm run desktop:dev
-
-# 只打未安装的目录，适合本机快速验证
-npm run desktop:dir
-
-# Windows NSIS 安装包（在 Windows 上执行）
-npm run desktop:win
-
-# macOS DMG（在 macOS 上执行）
-npm run desktop:mac
-```
-
-构建产物输出到 `release/`（已在 `.gitignore` 中忽略）。桌面版数据目录：
-
-- Windows：`%APPDATA%\Ayb\data`
-- macOS：`~/Library/Application Support/Ayb/data`
-
-桌面版首次启动没有演示账号，**第一个注册账号会成为管理员**，注册后会自动进入 `/admin` 并显示管理员引导。之后的普通账号通过 `?` 登录页进入学习空间。
-
-Windows 安装包与 macOS DMG 目前未做代码签名：Windows SmartScreen 可能提示“未知发布者”，macOS 需要右键“打开”或在系统设置中允许。GitHub Actions 的 `.github/workflows/desktop.yml` 会在 `v*` 标签或手动触发时构建 Windows 与 macOS 产物；macOS 任务使用 `--x64 --arm64` 生成两种架构的 DMG。
 
 ### 单实例说明
 
@@ -163,7 +127,6 @@ Windows 安装包与 macOS DMG 目前未做代码签名：Windows SmartScreen �
 - Next.js 15（App Router）+ React 19 + TypeScript
 - Tailwind CSS 4 + 自定义 CSS 设计变量
 - Motion 弹性动画
-- Electron 桌面外壳：内置 standalone Next.js 服务，Windows NSIS / macOS DMG 打包
 - 本地 JSON 持久化 + 进程内写队列 + 原子写入
 - scrypt 密码哈希 + 随机 opaque 会话令牌（数据库只保存 SHA-256 摘要）
 - Node.js `Intl` 本地日期、时区可配置
@@ -217,7 +180,7 @@ src/
       review/                # 复习队列与评分
       grammar/complete/      # 语法测验提交
       writings/              # 文章 CRUD
-      health/                # 容器健康检查
+      health/                # 健康检查
   components/                # 导航、词典、复习、语法、作者工具等 UI
   data/
     dictionary/              # 136 词条，按主题分文件
@@ -226,15 +189,8 @@ src/
     srs.ts                   # 纯函数间隔重复算法
     server/                  # JSON 数据库、会话、限流、业务服务
 public/
-  fonts/                     # 自托管字体 + OFL 许可文本
+  fonts/                     # 自托管字体与许可文本
   icon-192.png  icon-512.png # PWA 图标
-electron/
-  main.cjs                   # 桌面主进程：启动本地服务、窗口与外部链接策略
-  preload.cjs                # 最小 contextBridge 暴露
-scripts/desktop-dev.mjs      # 开发用 Next + Electron 启动器
-electron-builder.yml         # Windows / macOS 打包配置
-build/                       # 桌面图标（png / ico）
-.github/workflows/desktop.yml # Windows + macOS 构建 CI
 tests/e2e.mjs                # 浏览器端冒烟测试
 ```
 
@@ -260,14 +216,12 @@ AYB_BROWSER_PATH="/path/to/chrome" npm run qa
 
 - [ ] 设置真实 `NEXT_PUBLIC_SITE_URL` 与 HTTPS
 - [ ] 生产环境保持 `AYB_ENABLE_DEMO=false`
-- [ ] 为 `.data` / `ayb_data` 配置自动备份
+- [ ] 为 `.data` 配置自动备份，并确保运行用户有写权限
+- [ ] 用 systemd / PM2 让 `npm start` 常驻，并在反向代理层限流
 - [ ] 由母语者复核词典与语法内容
 - [ ] 补齐邮箱验证、密码重置、隐私政策与用户协议
 - [ ] 将本地 JSON 存储换为共享数据库（若需要多实例）
-- [ ] 在反向代理层限流与设置安全响应头
-- [ ] 为 Windows / macOS 安装包配置代码签名与公证
-- [ ] 在真实 macOS 设备上验证 DMG 与 Gatekeeper
-- [ ] 为桌面版添加自动更新与崩溃日志上报（尚未实现）
+- [ ] 在反向代理层设置安全响应头
 - [ ] 选择并添加代码许可证
 
 ## 致谢与许可

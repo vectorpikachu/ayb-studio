@@ -17,6 +17,7 @@ import {
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { AudioButton } from "@/components/audio-button";
 import { ArmenianWord } from "@/components/armenian-word";
+import { Handwriting } from "@/components/handwriting";
 import { Reveal } from "@/components/reveal";
 import {
   ARMENIAN_ALPHABET,
@@ -419,6 +420,12 @@ export function DictionaryExplorer({ words }: { words: DictionaryWord[] }) {
                         <span className="h-[2px] w-[2px] rounded-full bg-[var(--faint)]" />
                         <span style={{ color: meta.accent }}>{meta.label}</span>
                       </div>
+                      <Handwriting
+                        text={word.hy}
+                        className="mt-2"
+                        textClassName="text-[18px] leading-[1.4]"
+                        iconSize={11}
+                      />
                     </div>
                     <span className="mt-1 rounded-full border border-[var(--line)] px-2 py-1 text-[8px] font-semibold tracking-[0.08em] text-[var(--faint)]">
                       {word.level}
@@ -454,7 +461,7 @@ export function DictionaryExplorer({ words }: { words: DictionaryWord[] }) {
 
                   <div className="mt-4 flex items-center gap-2.5 border-t border-[var(--line)] pt-3.5">
                     <Quote size={10} className="shrink-0 text-[var(--faint)]" />
-                    <span className="truncate font-arm text-[11px] text-[var(--faint)]" lang="hy">
+                    <span className="truncate font-hand text-[14px] text-[var(--muted)]" lang="hy">
                       {word.example.hy}
                     </span>
                     <span className="ml-auto grid h-6 w-6 shrink-0 place-items-center rounded-full border border-[var(--line)] text-[var(--faint)] transition-all group-hover:border-[var(--accent)] group-hover:text-[var(--accent)]">
@@ -528,7 +535,7 @@ export function DictionaryExplorer({ words }: { words: DictionaryWord[] }) {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 18, scale: 0.99 }}
                 transition={{ type: "spring", stiffness: 260, damping: 28 }}
-                className="glass-strong relative my-4 w-full max-w-[700px] overflow-hidden rounded-[30px]"
+                className="modal-glass relative my-4 w-full max-w-[700px] overflow-hidden rounded-[30px]"
                 onClick={(event) => event.stopPropagation()}
               >
                 <div
@@ -577,6 +584,12 @@ export function DictionaryExplorer({ words }: { words: DictionaryWord[] }) {
                     <span className="mx-2 opacity-50">·</span>
                     {posLabels[selectedWord.pos]}
                   </p>
+                  <Handwriting
+                    text={selectedWord.hy}
+                    className="mt-3"
+                    textClassName="text-[32px] leading-[1.4]"
+                    iconSize={15}
+                  />
 
                   <div className="mt-7 grid gap-0 rounded-[16px] border border-[var(--line)] bg-[var(--surface)] px-5">
                     {[
@@ -616,6 +629,12 @@ export function DictionaryExplorer({ words }: { words: DictionaryWord[] }) {
                     >
                       {selectedWord.example.hy}
                     </p>
+                    <Handwriting
+                      text={selectedWord.example.hy}
+                      className="mt-2"
+                      textClassName="text-[22px] leading-[1.75]"
+                      iconSize={12}
+                    />
                     <p className="mt-2 text-[9px] italic tracking-[0.03em] text-[var(--faint)]">
                       {selectedWord.example.translit}
                     </p>

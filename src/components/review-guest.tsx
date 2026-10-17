@@ -11,6 +11,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { AudioButton } from "@/components/audio-button";
+import { Handwriting } from "@/components/handwriting";
 import { Reveal } from "@/components/reveal";
 
 const steps = [
@@ -98,6 +99,12 @@ export function ReviewGuest() {
                   նուռ
                 </p>
                 <p className="mt-3 text-[10px] tracking-[0.08em] text-[var(--faint)]">nurr</p>
+                <Handwriting
+                  text="նուռ"
+                  className="mt-3 justify-center"
+                  textClassName="text-[28px] leading-[1.4]"
+                  iconSize={13}
+                />
                 <div className="mt-7 grid gap-1.5 rounded-[14px] border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-left">
                   <div className="flex items-baseline gap-3">
                     <span className="w-5 text-[8px] text-[var(--faint)]">中</span>
@@ -122,6 +129,12 @@ export function ReviewGuest() {
                 <p className="mt-3 font-arm text-[17px] leading-[1.6] text-[var(--ink)]" lang="hy">
                   Աշնանը նուռը կարմիր է դառնում։
                 </p>
+                <Handwriting
+                  text="Աշնանը նուռը կարմիր է դառնում։"
+                  className="mt-2"
+                  textClassName="text-[18px] leading-[1.7]"
+                  iconSize={10}
+                />
                 <p className="mt-1.5 text-[9px] text-[var(--faint)]">秋天，石榴变红了。</p>
               </div>
 

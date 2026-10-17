@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { AudioButton } from "@/components/audio-button";
 import { ArmenianWord } from "@/components/armenian-word";
+import { Handwriting } from "@/components/handwriting";
 import {
   categoryMap,
   levelLabels,
@@ -514,6 +515,12 @@ export function ReviewStudio({
                             <p className="mt-4 text-[11px] tracking-[0.06em] text-[var(--faint)]">
                               {word.translit}
                             </p>
+                            <Handwriting
+                              text={word.hy}
+                              className="mt-3 justify-center"
+                              textClassName="text-[28px] leading-[1.4]"
+                              iconSize={13}
+                            />
                             <div className="mt-7 flex items-center gap-3 text-[9px] text-[var(--faint)]">
                               <span>{posLabels[word.pos]}</span>
                               <span className="h-[2px] w-[2px] rounded-full bg-[var(--faint)]" />
@@ -576,6 +583,12 @@ export function ReviewStudio({
                               <p className="mt-1.5 text-[9px] italic text-[var(--faint)]">
                                 {word.example.translit}
                               </p>
+                              <Handwriting
+                                text={word.example.hy}
+                                className="mt-2"
+                                textClassName="text-[18px] leading-[1.7]"
+                                iconSize={11}
+                              />
                               <p className="mt-3 border-l border-[var(--accent)] pl-3 text-[10px] leading-relaxed text-[var(--muted)]">
                                 {word.example.zh}
                               </p>

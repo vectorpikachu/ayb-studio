@@ -22,10 +22,10 @@ const armenianSans = localFont({
   fallback: ["Noto Sans Armenian", "sans-serif"],
 });
 
-// Hovhannes Tumanian's hand, by Ruben Tarumian. Free for personal and
-// commercial use; see public/fonts/LICENSE-TUMANIAN.txt.
+// A neat schoolbook hand by First Time Writing (CC0). It stays upright and
+// legible next to the printed Noto Sans Armenian, without calligraphic swirls.
 const armenianHand = localFont({
-  src: "../../public/fonts/hovhannes-tumanian.woff2",
+  src: "../../public/fonts/first-time-writing.woff2",
   variable: "--font-handwriting",
   display: "swap",
   weight: "400",

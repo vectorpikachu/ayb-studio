@@ -244,6 +244,22 @@
   -webkit-backdrop-filter: blur(44px) saturate(190%);
 }
 
+/* Dialogs need more body than a floating card: keep the glass rim, but let the
+   page underneath blur instead of reading through the text. */
+.modal-glass {
+  background:
+    linear-gradient(145deg, var(--glass-hi), transparent 38%),
+    color-mix(in srgb, var(--paper) 93%, transparent);
+  border: 1px solid var(--glass-edge);
+  box-shadow:
+    0 50px 130px -40px var(--glass-shadow),
+    0 10px 30px -12px var(--glass-shadow),
+    inset 0 1px 0 var(--glass-inset),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(50px) saturate(180%);
+  -webkit-backdrop-filter: blur(50px) saturate(180%);
+}
+
 .ambient {
   position: fixed;
   inset: 0;

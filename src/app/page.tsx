@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { AudioButton } from "@/components/audio-button";
 import { ArmenianWord } from "@/components/armenian-word";
+import { Handwriting } from "@/components/handwriting";
 import { Reveal } from "@/components/reveal";
 import { getWordOfTheDay, posLabels } from "@/data/dictionary";
 import { getCurrentUser } from "@/lib/server/auth";
@@ -338,6 +339,13 @@ export default async function HomePage() {
                   </p>
                 </div>
 
+                <Handwriting
+                  text={word.hy}
+                  className="mt-5"
+                  textClassName="text-[32px] leading-[1.35]"
+                  iconSize={15}
+                />
+
                 <Link href="/dictionary" className="arrow-link mt-8">
                   查看完整词条
                   <ArrowUpRight size={13} />
@@ -353,6 +361,12 @@ export default async function HomePage() {
                   <p className="mt-2 text-[10px] italic tracking-[0.03em] text-[var(--faint)]">
                     {word.example.translit}
                   </p>
+                  <Handwriting
+                    text={word.example.hy}
+                    className="mt-2.5"
+                    textClassName="text-[19px] leading-[1.75]"
+                    iconSize={11}
+                  />
                   <div className="mt-5 space-y-1.5 border-l border-[var(--accent)] pl-4">
                     <p className="text-[11px] leading-relaxed text-[var(--muted)]">
                       {word.example.zh}

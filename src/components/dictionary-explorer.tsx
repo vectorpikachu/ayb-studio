@@ -423,7 +423,7 @@ export function DictionaryExplorer({ words }: { words: DictionaryWord[] }) {
                       <Handwriting
                         text={word.hy}
                         className="mt-2"
-                        textClassName="text-[18px] leading-[1.4]"
+                        textClassName="text-[22px] leading-[1.4]"
                         iconSize={11}
                       />
                     </div>
@@ -461,7 +461,7 @@ export function DictionaryExplorer({ words }: { words: DictionaryWord[] }) {
 
                   <div className="mt-4 flex items-center gap-2.5 border-t border-[var(--line)] pt-3.5">
                     <Quote size={10} className="shrink-0 text-[var(--faint)]" />
-                    <span className="truncate font-hand text-[14px] text-[var(--muted)]" lang="hy">
+                    <span className="truncate font-hand text-[16px] text-[var(--muted)]" lang="hy">
                       {word.example.hy}
                     </span>
                     <span className="ml-auto grid h-6 w-6 shrink-0 place-items-center rounded-full border border-[var(--line)] text-[var(--faint)] transition-all group-hover:border-[var(--accent)] group-hover:text-[var(--accent)]">
@@ -632,7 +632,7 @@ export function DictionaryExplorer({ words }: { words: DictionaryWord[] }) {
                     <Handwriting
                       text={selectedWord.example.hy}
                       className="mt-2"
-                      textClassName="text-[22px] leading-[1.75]"
+                      textClassName="text-[23px] leading-[1.75]"
                       iconSize={12}
                     />
                     <p className="mt-2 text-[9px] italic tracking-[0.03em] text-[var(--faint)]">

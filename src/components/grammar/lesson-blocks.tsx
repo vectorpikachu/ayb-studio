@@ -22,7 +22,7 @@ function ExampleCard({ example }: { example: GrammarExample }) {
       <Handwriting
         text={example.hy}
         className="mt-2.5 pl-3"
-        textClassName="text-[19px] leading-[1.75]"
+        textClassName="text-[21px] leading-[1.75]"
         iconSize={11}
       />
       <p className="mt-2.5 pl-3 text-[11px] leading-[1.8] text-[var(--muted)]">{example.zh}</p>
@@ -159,7 +159,7 @@ export function GrammarBlocks({ blocks }: { blocks: GrammarBlock[] }) {
                       {letter.upper}
                       <span className="ml-1 text-[17px] text-[var(--muted)]">{letter.lower}</span>
                     </p>
-                    <p className="mt-1.5 font-hand text-[22px] leading-none text-[var(--accent)]" lang="hy">
+                    <p className="mt-1.5 font-hand text-[24px] leading-none text-[var(--accent)]" lang="hy">
                       {letter.lower}
                     </p>
                     <p className="mt-2 truncate text-[8px] text-[var(--faint)]" lang="hy">

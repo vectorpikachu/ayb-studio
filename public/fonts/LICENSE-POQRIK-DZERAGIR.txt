@@ -1,0 +1,15 @@
+Poqrik dzeragir (Փոքրիկ ձեռագիր)
+================================
+
+Author: poqrik.am (2020)
+Source: https://fonter.am/en/fonts/poqrik-dzeragir
+
+Terms (as published by the author through fonter.am):
+- Free to download and free to use, personally or commercially.
+- Credit is not required, but always welcome.
+- You may not sell the font file itself, rename it, claim the design as
+  your own, or modify it and pass the result off as the original font.
+
+The file in this directory is an Armenian-only subset converted to WOFF2 for
+web use. The letterforms are unchanged. Latin annotations use First Time
+Writing (CC0), a separate hand face, through a unicode-range split.

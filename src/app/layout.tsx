@@ -22,16 +22,6 @@ const armenianSans = localFont({
   fallback: ["Noto Sans Armenian", "sans-serif"],
 });
 
-// A neat schoolbook hand by First Time Writing (CC0). It stays upright and
-// legible next to the printed Noto Sans Armenian, without calligraphic swirls.
-const armenianHand = localFont({
-  src: "../../public/fonts/first-time-writing.woff2",
-  variable: "--font-handwriting",
-  display: "swap",
-  weight: "400",
-  fallback: ["Noto Sans Armenian", "cursive"],
-});
-
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: {
@@ -90,9 +80,23 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       lang="zh-CN"
       data-theme="light"
       suppressHydrationWarning
-      className={`${notoSans.variable} ${armenianSans.variable} ${armenianHand.variable}`}
+      className={`${notoSans.variable} ${armenianSans.variable}`}
     >
       <head>
+        <link
+          rel="preload"
+          href="/fonts/poqrik-dzeragir.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/fonts/first-time-writing.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body>

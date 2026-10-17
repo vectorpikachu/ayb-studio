@@ -1,5 +1,25 @@
 @import "tailwindcss";
 
+/* Two hands, one family: Poqrik for the Armenian letters, First Time Writing
+   for Latin words and punctuation. unicode-range keeps the split automatic. */
+@font-face {
+  font-family: "Ayb Hand";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/poqrik-dzeragir.woff2") format("woff2");
+  unicode-range: U+0530-058F;
+}
+
+@font-face {
+  font-family: "Ayb Hand";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/first-time-writing.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+2000-206F, U+20AC;
+}
+
 @theme inline {
   --font-ui: var(--font-noto-sans), var(--font-armenian), "Noto Sans SC", "PingFang SC",
     "Microsoft YaHei", sans-serif;
@@ -7,7 +27,7 @@
     "Microsoft YaHei", sans-serif;
   --font-display: var(--font-armenian), var(--font-noto-sans), "Noto Sans SC", "PingFang SC",
     "Microsoft YaHei", sans-serif;
-  --font-hand: var(--font-handwriting), var(--font-armenian), "Noto Sans SC", "PingFang SC",
+  --font-hand: "Ayb Hand", var(--font-armenian), "Noto Sans SC", "PingFang SC",
     "Microsoft YaHei", cursive;
   --font-mono: "SFMono-Regular", "Cascadia Code", Consolas, "Liberation Mono", monospace;
 

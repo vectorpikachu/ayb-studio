@@ -117,7 +117,7 @@ cp .data/ayb.db.json backups/ayb-$(date +%F).json
 
 - **词典**：`136` 个词，10 个主题。
 - **语法**：`13` 节课，约 `145` 分钟阅读量，42 道自测题；覆盖 A1 到 B2。
-- **字体**：Noto Sans 负责拉丁与 UI，Noto Sans Armenian 负责亚美尼亚语印刷体正文，First Time Writing 的手写体负责标题、引文、字母表，以及单词和例句旁的手写对照；中文回退到系统 UI 字体（PingFang SC / Microsoft YaHei）。三者均自托管，不依赖 Google Fonts 运行时。
+- **字体**：Noto Sans 负责拉丁与 UI，Noto Sans Armenian 负责亚美尼亚语印刷体正文，Poqrik dzeragir 的规整连笔手写体负责亚美尼亚语标题、引文、字母表，以及单词和例句旁的手写对照；拉丁手写注释用 First Time Writing；中文回退到系统 UI 字体（PingFang SC / Microsoft YaHei）。这些字体均自托管，不依赖 Google Fonts 运行时。
 - **内容语言**：中文为主要学习界面；词条保留英语、俄语、中文三种释义，方便多语学习者。
 
 词表与语法说明是面向初学者的种子内容，例句为学习场景原创；**在正式商业发布前，建议请亚美尼亚语母语者做一轮翻译与语用校订**，特别是格变化、动词变位与习惯搭配。
@@ -136,7 +136,7 @@ cp .data/ayb.db.json backups/ayb-$(date +%F).json
 
 - 浅色默认主题，可切到深色夜间主题；
 - **Liquid Glass 视觉语言**：彩色光场背景、可透光的磨砂面板、明亮的内描边与克制的高光；导航、按钮、卡片与写作纸张共享同一套玻璃材质；
-- **印刷体 + 手写体**：Noto Sans / Noto Sans Armenian 负责可读的印刷体，First Time Writing 的手写体出现在标题、引文、字母表，以及单词与例句旁的对照行里，形成克制的印刷体 / 手写体并置；
+- **印刷体 + 手写体**：Noto Sans / Noto Sans Armenian 负责可读的印刷体，Poqrik dzeragir 的连笔手写体出现在标题、引文、字母表，以及单词与例句旁的对照行里，形成清楚的印刷体 / 手写体并置；拉丁注释由 First Time Writing 补位；
 - 字体统一到 Noto Sans 家族：拉丁、亚美尼亚语与 UI 使用同一套无衬线骨架，中文回退到系统 CJK 字体；不再使用衬线亚美尼亚语标题；
 - 首页、词典、复习、语法、写作分别有不同的编辑节奏，但共享同一套排版和间距系统；
 - 对移动端做专门处理：复习与写作编辑器会隐藏底部 Dock，保留完整操作空间；
@@ -228,7 +228,7 @@ AYB_BROWSER_PATH="/path/to/chrome" npm run qa
 
 - 早期布局节奏参考 [Innei / Shiro](https://github.com/Innei/Shiro) 的悬浮胶囊导航与大留白；Liquid Glass 材质、配色与组件为独立实现，未复制其代码或资产。
 - 字体来自 Google Fonts：Noto Sans、Noto Sans Armenian；均为 SIL Open Font License 1.1，许可文本在 `public/fonts/`。
-- 手写体 First Time Writing 通过 [fonter.am](https://fonter.am/en/fonts/first-time-writing) 发布，采用 CC0 1.0 公共领域 dedication；应用内使用的是 Armenian + Latin + 标点子集转成的 WOFF2，许可说明在 `public/fonts/`。
+- 亚美尼亚语手写体 Poqrik dzeragir 由 [poqrik.am](https://fonter.am/en/fonts/poqrik-dzeragir) 发布，作者声明可免费用于个人与商业项目；拉丁手写注释使用 [First Time Writing](https://fonter.am/en/fonts/first-time-writing)（CC0 1.0）。两者都以 subset WOFF2 自托管，许可说明在 `public/fonts/`。
 - 图标来自 [Lucide](https://lucide.dev/)（ISC）。
 - 亚美尼亚语例句与课程说明为 Ayb 项目内容，供学习与演示使用。
 - 本项目当前未附加代码开源许可证；若计划公开分发，请自行选择许可协议。

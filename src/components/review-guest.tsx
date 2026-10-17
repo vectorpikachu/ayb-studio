@@ -102,7 +102,7 @@ export function ReviewGuest() {
                 <Handwriting
                   text="նուռ"
                   className="mt-3 justify-center"
-                  textClassName="text-[28px] leading-[1.4]"
+                  textClassName="text-[30px] leading-[1.4]"
                   iconSize={13}
                 />
                 <div className="mt-7 grid gap-1.5 rounded-[14px] border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-left">
@@ -132,7 +132,7 @@ export function ReviewGuest() {
                 <Handwriting
                   text="Աշնանը նուռը կարմիր է դառնում։"
                   className="mt-2"
-                  textClassName="text-[18px] leading-[1.7]"
+                  textClassName="text-[19px] leading-[1.7]"
                   iconSize={10}
                 />
                 <p className="mt-1.5 text-[9px] text-[var(--faint)]">秋天，石榴变红了。</p>

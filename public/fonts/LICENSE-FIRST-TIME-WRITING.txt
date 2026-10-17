@@ -2,7 +2,9 @@ First Time Writing (v1.40)
 Source: https://fonter.am/en/fonts/first-time-writing
 License: Creative Commons Zero v1.0 Universal (CC0 1.0)
 The font file in this directory is a subset (Armenian + Latin + punctuation)
-converted to WOFF2 for web use. CC0 permits modification and redistribution.
+converted to WOFF2 for web use. In Ayb it supplies the Latin hand glyphs of the
+"Ayb Hand" family through a unicode-range split; Armenian glyphs come from
+Poqrik dzeragir. CC0 permits modification and redistribution.
 Creative Commons Legal Code
 
 CC0 1.0 Universal

@@ -364,7 +364,7 @@ export default async function HomePage() {
                   <Handwriting
                     text={word.example.hy}
                     className="mt-2.5"
-                    textClassName="text-[19px] leading-[1.75]"
+                    textClassName="text-[20px] leading-[1.75]"
                     iconSize={11}
                   />
                   <div className="mt-5 space-y-1.5 border-l border-[var(--accent)] pl-4">

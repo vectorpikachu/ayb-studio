@@ -518,7 +518,7 @@ export function ReviewStudio({
                             <Handwriting
                               text={word.hy}
                               className="mt-3 justify-center"
-                              textClassName="text-[28px] leading-[1.4]"
+                              textClassName="text-[30px] leading-[1.4]"
                               iconSize={13}
                             />
                             <div className="mt-7 flex items-center gap-3 text-[9px] text-[var(--faint)]">
@@ -586,7 +586,7 @@ export function ReviewStudio({
                               <Handwriting
                                 text={word.example.hy}
                                 className="mt-2"
-                                textClassName="text-[18px] leading-[1.7]"
+                                textClassName="text-[19px] leading-[1.7]"
                                 iconSize={11}
                               />
                               <p className="mt-3 border-l border-[var(--accent)] pl-3 text-[10px] leading-relaxed text-[var(--muted)]">

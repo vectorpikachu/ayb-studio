@@ -12,6 +12,7 @@ import {
 import { AudioButton } from "@/components/audio-button";
 import { Reveal } from "@/components/reveal";
 import { getWordOfTheDay, posLabels } from "@/data/dictionary";
+import { getCurrentUser } from "@/lib/server/auth";
 
 const features = [
   {
@@ -130,8 +131,9 @@ const features = [
   },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
   const word = getWordOfTheDay();
+  const user = await getCurrentUser();
 
   return (
     <div className="overflow-hidden">
@@ -142,7 +144,7 @@ export default function HomePage() {
               <div className="mb-7 flex flex-wrap items-center gap-3">
                 <span className="inline-flex items-center gap-2 rounded-full border border-[var(--line)] bg-[color-mix(in_srgb,var(--elevated)_55%,transparent)] px-3 py-1.5 text-[9px] font-semibold tracking-[0.16em] text-[var(--muted)]">
                   <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
-                  AYB · ARMENIAN STUDIO
+                  {user ? `WELCOME BACK · ${user.name.toUpperCase()}` : "AYB · ARMENIAN STUDIO"}
                 </span>
                 <span className="hidden text-[9px] tracking-[0.15em] text-[var(--faint)] sm:inline">
                   EST. 405 AD · ՄԵՍՐՈՊ ՄԱՇՏՈՑ
@@ -181,8 +183,8 @@ export default function HomePage() {
 
             <Reveal delay={0.18}>
               <div className="mt-9 flex flex-wrap items-center gap-3">
-                <Link href="/register" className="btn btn-primary">
-                  开始学习
+                <Link href={user ? "/review" : "/register"} className="btn btn-primary">
+                  {user ? "继续今日复习" : "开始学习"}
                   <ArrowRight size={14} strokeWidth={2} />
                 </Link>
                 <Link href="/dictionary" className="btn btn-ghost">
@@ -511,8 +513,8 @@ export default function HomePage() {
                 Սկսենք մի բառից։
               </span>
             </p>
-            <Link href="/register" className="btn btn-primary">
-              创建你的学习空间
+            <Link href={user ? "/review" : "/register"} className="btn btn-primary">
+              {user ? "回到今天的学习" : "创建你的学习空间"}
               <ArrowUpRight size={14} />
             </Link>
           </div>

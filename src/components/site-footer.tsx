@@ -1,7 +1,15 @@
 import Link from "next/link";
 import { Brand } from "@/components/brand";
+import type { SessionUser } from "@/lib/auth-types";
 
-export function SiteFooter() {
+const learningLinks = [
+  { href: "/dictionary", label: "词典" },
+  { href: "/review", label: "复习" },
+  { href: "/grammar", label: "语法" },
+  { href: "/write", label: "写作" },
+];
+
+export function SiteFooter({ user }: { user: SessionUser | null }) {
   return (
     <footer className="mt-20 border-t border-[var(--line)] pb-28 pt-10 md:mt-28 md:pb-10">
       <div className="container-ayb">
@@ -13,25 +21,42 @@ export function SiteFooter() {
               <br />A small studio for a beautiful language.
             </p>
           </div>
-          <div className="grid grid-cols-2 gap-x-16 gap-y-2 text-[11px] text-[var(--muted)] sm:grid-cols-3">
-            <Link className="transition-colors hover:text-[var(--ink)]" href="/dictionary">
-              词典
-            </Link>
-            <Link className="transition-colors hover:text-[var(--ink)]" href="/grammar">
-              语法
-            </Link>
-            <Link className="transition-colors hover:text-[var(--ink)]" href="/write">
-              写作
-            </Link>
-            <Link className="transition-colors hover:text-[var(--ink)]" href="/review">
-              复习
-            </Link>
-            <Link className="transition-colors hover:text-[var(--ink)]" href="/login">
-              登录
-            </Link>
-            <Link className="transition-colors hover:text-[var(--ink)]" href="/register">
-              注册
-            </Link>
+          <div className="flex gap-16 sm:gap-20">
+            <div>
+              <p className="eyebrow mb-3">学习 LEARN</p>
+              <div className="grid gap-2 text-[11px] text-[var(--muted)]">
+                {learningLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    className="transition-colors hover:text-[var(--ink)]"
+                    href={link.href}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="eyebrow mb-3">账户 ACCOUNT</p>
+              {user ? (
+                <div className="text-[11px] leading-[1.8] text-[var(--muted)]">
+                  <p className="max-w-[150px] truncate font-medium text-[var(--ink)]">{user.name}</p>
+                  <p className="max-w-[150px] truncate text-[9px] text-[var(--faint)]">{user.email}</p>
+                  <Link href="/write" className="mt-2 inline-block text-[10px] transition-colors hover:text-[var(--ink)]">
+                    我的写作 →
+                  </Link>
+                </div>
+              ) : (
+                <div className="grid gap-2 text-[11px] text-[var(--muted)]">
+                  <Link className="transition-colors hover:text-[var(--ink)]" href="/login">
+                    登录
+                  </Link>
+                  <Link className="transition-colors hover:text-[var(--ink)]" href="/register">
+                    创建账户
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
         </div>
         <div className="mt-10 flex flex-col gap-3 border-t border-[var(--line)] pt-5 text-[9px] tracking-[0.08em] text-[var(--faint)] sm:flex-row sm:items-center sm:justify-between">

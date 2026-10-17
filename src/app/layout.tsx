@@ -4,6 +4,7 @@ import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { MobileDock } from "@/components/mobile-dock";
+import { getCurrentUser } from "@/lib/server/auth";
 
 const manrope = localFont({
   src: "../../public/fonts/manrope-latin.woff2",
@@ -72,7 +73,9 @@ const themeScript = `
 })();
 `;
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const user = await getCurrentUser();
+
   return (
     <html
       lang="zh-CN"
@@ -87,9 +90,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <div className="ambient" aria-hidden />
         <div className="grain" aria-hidden />
         <div className="flex min-h-screen flex-col">
-          <SiteHeader />
+          <SiteHeader user={user} />
           <main className="flex-1">{children}</main>
-          <SiteFooter />
+          <SiteFooter user={user} />
         </div>
         <MobileDock />
       </body>

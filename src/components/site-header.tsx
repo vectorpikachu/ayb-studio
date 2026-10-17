@@ -2,18 +2,20 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Compass } from "lucide-react";
+import { Compass, UserRound } from "lucide-react";
 import { Brand } from "@/components/brand";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { UserMenu } from "@/components/user-menu";
 import { cn } from "@/lib/utils";
 import { navItems } from "@/lib/constants";
+import type { SessionUser } from "@/lib/auth-types";
 
 function isActive(pathname: string, href: string, match?: string) {
   if (match === "exact" || href === "/") return pathname === href;
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function SiteHeader() {
+export function SiteHeader({ user }: { user: SessionUser | null }) {
   const pathname = usePathname();
 
   return (
@@ -58,18 +60,31 @@ export function SiteHeader() {
 
         <div className="pointer-events-auto flex items-center gap-2">
           <ThemeToggle />
-          <Link
-            href="/login"
-            className="hidden h-9 items-center rounded-full border border-[var(--line)] bg-[var(--nav-bg)] px-4 text-[11px] font-semibold tracking-[0.04em] text-[var(--ink)] backdrop-blur-xl transition-colors hover:border-[var(--line-strong)] sm:inline-flex"
-          >
-            登录
-          </Link>
-          <Link
-            href="/register"
-            className="hidden h-9 items-center rounded-full bg-[var(--ink)] px-4 text-[11px] font-semibold tracking-[0.04em] text-[var(--paper)] transition-colors hover:bg-[var(--accent)] hover:text-[#fff8ef] sm:inline-flex"
-          >
-            开始学习
-          </Link>
+          {user ? (
+            <UserMenu user={user} />
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="hidden h-9 items-center rounded-full border border-[var(--line)] bg-[var(--nav-bg)] px-4 text-[11px] font-semibold tracking-[0.04em] text-[var(--ink)] backdrop-blur-xl transition-colors hover:border-[var(--line-strong)] sm:inline-flex"
+              >
+                登录
+              </Link>
+              <Link
+                href="/register"
+                className="hidden h-9 items-center rounded-full bg-[var(--ink)] px-4 text-[11px] font-semibold tracking-[0.04em] text-[var(--paper)] transition-colors hover:bg-[var(--accent)] hover:text-[#fff8ef] sm:inline-flex"
+              >
+                开始学习
+              </Link>
+              <Link
+                href="/login"
+                aria-label="登录 Ayb"
+                className="grid h-9 w-9 place-items-center rounded-full border border-[var(--line)] bg-[var(--nav-bg)] text-[var(--muted)] backdrop-blur-xl transition-colors hover:text-[var(--ink)] sm:hidden"
+              >
+                <UserRound size={15} strokeWidth={1.8} />
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>

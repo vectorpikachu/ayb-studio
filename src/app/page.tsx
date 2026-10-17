@@ -67,15 +67,17 @@ const features = [
     accent: "var(--apricot)",
     visual: (
       <div className="relative flex h-full items-center justify-center pt-5">
-        <div className="absolute h-[106px] w-[168px] -rotate-[7deg] rounded-xl border border-[var(--line)] bg-[var(--surface-2)] opacity-55" />
-        <div className="absolute h-[106px] w-[168px] rotate-[4deg] rounded-xl border border-[var(--line)] bg-[var(--surface)] opacity-80" />
-        <div className="relative flex h-[106px] w-[168px] flex-col justify-between rounded-xl border border-[var(--line-strong)] bg-[var(--elevated)] p-4 shadow-xl">
+        <div className="absolute h-[112px] w-[184px] -rotate-[7deg] rounded-xl border border-[var(--line)] bg-[var(--surface-2)] opacity-55" />
+        <div className="absolute h-[112px] w-[184px] rotate-[4deg] rounded-xl border border-[var(--line)] bg-[var(--surface)] opacity-80" />
+        <div className="relative flex h-[112px] w-[184px] flex-col justify-between overflow-hidden rounded-xl border border-[var(--line-strong)] bg-[var(--elevated)] p-4 shadow-xl">
           <div className="flex items-center justify-between">
             <span className="text-[8px] tracking-[0.16em] text-[var(--faint)]">DUE TODAY</span>
             <span className="h-1.5 w-1.5 rounded-full bg-[var(--apricot)]" />
           </div>
           <div>
-            <p className="font-arm text-[27px] leading-none text-[var(--ink)]">շնորհակալություն</p>
+            <p className="whitespace-nowrap font-arm text-[17px] leading-none text-[var(--ink)]">
+              շնորհակալություն
+            </p>
             <p className="mt-1.5 text-[8px] tracking-[0.08em] text-[var(--faint)]">
               shnorhakalutyun · thank you
             </p>

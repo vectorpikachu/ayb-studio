@@ -1,14 +1,6 @@
-export type ReviewGrade = 0 | 1 | 2 | 3;
+import type { ReviewState } from "@/lib/srs";
 
-export type ReviewState = {
-  ease: number;
-  interval: number;
-  repetitions: number;
-  lapses: number;
-  due: string;
-  lastReviewed: string;
-  lastGrade: ReviewGrade;
-};
+export type { ReviewGrade, ReviewState } from "@/lib/srs";
 
 export type GrammarProgress = {
   completedAt: string;

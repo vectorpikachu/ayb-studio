@@ -13,6 +13,7 @@ import { AudioButton } from "@/components/audio-button";
 import { Reveal } from "@/components/reveal";
 import { getWordOfTheDay, posLabels } from "@/data/dictionary";
 import { getCurrentUser } from "@/lib/server/auth";
+import { getLearnerOverview } from "@/lib/server/stats";
 
 const features = [
   {
@@ -134,6 +135,7 @@ const features = [
 export default async function HomePage() {
   const word = getWordOfTheDay();
   const user = await getCurrentUser();
+  const overview = user ? await getLearnerOverview(user.id) : null;
 
   return (
     <div className="overflow-hidden">
@@ -195,18 +197,42 @@ export default async function HomePage() {
             </Reveal>
 
             <Reveal delay={0.24}>
-              <div className="mt-12 flex items-center gap-5 text-[9px] tracking-[0.1em] text-[var(--faint)]">
-                <div className="flex items-center gap-2">
-                  <span className="font-arm text-[13px] text-[var(--muted)]">38</span>
-                  个字母
-                </div>
-                <span className="h-3 w-[1px] bg-[var(--line)]" />
-                <div className="flex items-center gap-2">
-                  <span className="font-arm text-[13px] text-[var(--muted)]">4</span>
-                  种语言互查
-                </div>
-                <span className="h-3 w-[1px] bg-[var(--line)]" />
-                <span>每天 10 分钟</span>
+              <div className="mt-12 flex flex-wrap items-center gap-5 text-[9px] tracking-[0.1em] text-[var(--faint)]">
+                {overview ? (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <span className="font-arm text-[13px] text-[var(--muted)]">{overview.streak}</span>
+                      天连续
+                    </div>
+                    <span className="h-3 w-[1px] bg-[var(--line)]" />
+                    <div className="flex items-center gap-2">
+                      <span className="font-arm text-[13px] text-[var(--muted)]">{overview.learnedCount}</span>
+                      个已学词
+                    </div>
+                    <span className="h-3 w-[1px] bg-[var(--line)]" />
+                    <Link href="/review" className="transition-colors hover:text-[var(--ink)]">
+                      {overview.dueCount > 0
+                        ? `${overview.dueCount} 个词到期 →`
+                        : overview.newCount > 0
+                          ? `还有 ${overview.newCount} 个新词 →`
+                          : "今天的复习已完成 →"}
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <span className="font-arm text-[13px] text-[var(--muted)]">38</span>
+                      个字母
+                    </div>
+                    <span className="h-3 w-[1px] bg-[var(--line)]" />
+                    <div className="flex items-center gap-2">
+                      <span className="font-arm text-[13px] text-[var(--muted)]">4</span>
+                      种语言互查
+                    </div>
+                    <span className="h-3 w-[1px] bg-[var(--line)]" />
+                    <span>每天 10 分钟</span>
+                  </>
+                )}
               </div>
             </Reveal>
           </div>

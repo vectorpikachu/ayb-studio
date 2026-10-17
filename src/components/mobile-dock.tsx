@@ -17,6 +17,10 @@ const icons = {
 export function MobileDock() {
   const pathname = usePathname();
 
+  // Keep the review session immersive: the floating card and its rating
+  // controls should never sit underneath the navigation dock.
+  if (pathname.startsWith("/review")) return null;
+
   return (
     <nav
       aria-label="移动端导航"

@@ -68,7 +68,7 @@ function buildDemoReviewStates(now: Date): Record<string, ReviewState> {
 function buildDemoActivities(now: Date): ActivityRecord[] {
   const activities: ActivityRecord[] = [];
   for (let day = 0; day < 7; day += 1) {
-    const at = day === 0 ? atHoursAgo(now, 2) : atDaysAgo(now, day, 19);
+    const at = day === 0 ? atHoursAgo(now, 0.08) : atDaysAgo(now, day, 19);
     activities.push(
       {
         id: randomUUID(),
@@ -81,7 +81,7 @@ function buildDemoActivities(now: Date): ActivityRecord[] {
         id: randomUUID(),
         userId: "demo-user",
         type: "review",
-        at: day === 0 ? atHoursAgo(now, 1) : atDaysAgo(now, day, 8),
+        at: day === 0 ? atHoursAgo(now, 0.03) : atDaysAgo(now, day, 8),
         meta: { count: 3 + (day % 2) },
       },
     );

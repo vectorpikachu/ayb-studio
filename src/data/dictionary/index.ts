@@ -67,9 +67,9 @@ const dailyWordIds = [
   "hats",
 ];
 
-export function getWordOfTheDay(date = new Date()): DictionaryWord {
+export function getWordOfTheDay(date = new Date(), source: DictionaryWord[] = words): DictionaryWord {
   const start = new Date(date.getFullYear(), 0, 0);
   const day = Math.floor((date.getTime() - start.getTime()) / 86_400_000);
   const id = dailyWordIds[day % dailyWordIds.length];
-  return getWordById(id) ?? words[0];
+  return source.find((word) => word.id === id) ?? source[0] ?? words[0];
 }

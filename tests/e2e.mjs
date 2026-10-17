@@ -32,14 +32,28 @@ async function waitForText(text, timeout = 10_000) {
 }
 
 try {
-  // Landing page and dictionary search.
+  // Landing page and light default theme.
   await page.goto(baseURL, { waitUntil: "networkidle" });
   assert.match(await page.title(), /Ayb/);
+  assert.equal(await page.locator("html").getAttribute("data-theme"), "light");
+
+  // Dictionary search, including a long Armenian word that must fit its card.
   await page.goto(`${baseURL}/dictionary`, { waitUntil: "networkidle" });
   const search = page.locator('input[aria-label="搜索词典"]');
   await search.fill("вода");
   await page.waitForTimeout(500);
   assert.equal(await page.locator("button[aria-label^='查看词条']").count(), 1);
+
+  await search.fill("շնորհակալություն");
+  await page.waitForTimeout(500);
+  const longWordCard = page.locator("button[aria-label^='查看词条']").first();
+  assert.ok(await longWordCard.count(), "long Armenian word should be found");
+  const fits = await longWordCard.evaluate(
+    (element) =>
+      element.scrollWidth <= element.clientWidth + 1 &&
+      element.getBoundingClientRect().right <= window.innerWidth + 1,
+  );
+  assert.ok(fits, "long Armenian word should not overflow its card");
 
   // Demo login.
   await page.goto(`${baseURL}/login`, { waitUntil: "networkidle" });
@@ -64,10 +78,62 @@ try {
 
   // Grammar content and quiz presence.
   await page.goto(`${baseURL}/grammar`, { waitUntil: "networkidle" });
-  await waitForText("九节课");
+  await waitForText("语法不是围墙");
+  await waitForText("一条慢慢变清晰的路。");
   await page.goto(`${baseURL}/grammar/to-be`, { waitUntil: "networkidle" });
   assert.ok((await page.locator("h1").innerText()).includes("是"));
-  await waitForText("三题小测");
+  await page.getByText(/题小测/).first().waitFor({ timeout: 10_000 });
+
+  // Admin onboarding, template download, JSON upload, and delete.
+  await page.goto(`${baseURL}/admin?welcome=1`, { waitUntil: "networkidle" });
+  await waitForText("内容管理。");
+  await waitForText("你已经是这个实例的管理员。");
+  const templateHref = await page
+    .getByRole("link", { name: "下载模板" })
+    .first()
+    .getAttribute("href");
+  assert.equal(templateHref, "/templates/word-upload.json");
+
+  const adminWord = {
+    id: "e2e-tsiatsanaguyn",
+    hy: "ծիածանագույն",
+    translit: "tsiatsanaguyn",
+    pos: "adjective",
+    level: "A1",
+    category: "nature",
+    en: "rainbow-colored",
+    ru: "радужный",
+    zh: "彩虹色的",
+    example: {
+      hy: "Երեխան նկարեց ծիածանագույն երազ։",
+      translit: "Yerekhan nkarets' tsiatsanaguyn yeraz.",
+      en: "The child drew a rainbow-colored dream.",
+      zh: "孩子画了一个彩虹色的梦。",
+    },
+  };
+
+  await page.locator("#admin-json-upload").setInputFiles({
+    name: "e2e-word.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(JSON.stringify({ words: [adminWord] })),
+  });
+  await page.getByRole("button", { name: "确认导入" }).click();
+  await waitForText("已保存 1 个词条", 15_000);
+
+  await page.goto(`${baseURL}/dictionary`, { waitUntil: "networkidle" });
+  await search.fill(adminWord.hy);
+  await page.waitForTimeout(600);
+  assert.equal(await page.locator("button[aria-label^='查看词条']").count(), 1);
+
+  await page.goto(`${baseURL}/admin`, { waitUntil: "networkidle" });
+  await page.getByRole("button", { name: `删除词条 ${adminWord.hy}` }).click();
+  await page.getByRole("button", { name: "确认", exact: true }).click();
+  await page.waitForTimeout(900);
+
+  await page.goto(`${baseURL}/dictionary`, { waitUntil: "networkidle" });
+  await search.fill(adminWord.hy);
+  await page.waitForTimeout(600);
+  assert.equal(await page.locator("button[aria-label^='查看词条']").count(), 0);
 
   // Writing: create a draft, autosave it, then remove it again.
   await page.goto(`${baseURL}/write`, { waitUntil: "networkidle" });
@@ -95,7 +161,9 @@ try {
   await page.waitForTimeout(700);
 
   assert.deepEqual(errors, []);
-  console.log("E2E OK — dictionary, login, review, grammar, and writing are working.");
+  console.log(
+    "E2E OK — theme, dictionary, long words, login, review, grammar, admin upload/delete, and writing are working.",
+  );
 } finally {
   await browser.close();
 }

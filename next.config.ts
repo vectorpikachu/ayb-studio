@@ -7,6 +7,16 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ["lucide-react", "motion"],
   },
+  outputFileTracingExcludes: {
+    "*": [
+      ".data/**/*",
+      ".ref/**/*",
+      "qa-output/**/*",
+      "release/**/*",
+      "electron/**/*",
+      "scripts/**/*",
+    ],
+  },
   async headers() {
     return [
       {

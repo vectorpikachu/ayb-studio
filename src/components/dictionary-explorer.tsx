@@ -26,18 +26,9 @@ import {
   posLabels,
   type DictionaryWord,
 } from "@/data/dictionary";
-import { words } from "@/data/dictionary";
 import { cn } from "@/lib/utils";
 
 const PAGE_SIZE = 24;
-
-const alphabeticallySorted = [...words].sort((a, b) => a.hy.localeCompare(b.hy, "hy"));
-
-const availableLetters = new Set(
-  alphabeticallySorted.map((word) => Array.from(word.hy)[0]?.toUpperCase()).filter(Boolean),
-);
-
-const visibleAlphabet = ARMENIAN_ALPHABET.filter((letter) => availableLetters.has(letter));
 
 function normalize(value: string) {
   return value.normalize("NFC").toLocaleLowerCase("hy").trim();
@@ -48,7 +39,7 @@ function isEditableTarget(target: EventTarget | null) {
   return Boolean(target.closest("input, textarea, select, [contenteditable='true']"));
 }
 
-export function DictionaryExplorer() {
+export function DictionaryExplorer({ words }: { words: DictionaryWord[] }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string>("all");
   const [letter, setLetter] = useState<string>("all");
@@ -58,6 +49,26 @@ export function DictionaryExplorer() {
   const closeRef = useRef<HTMLButtonElement>(null);
   const deferredQuery = useDeferredValue(query);
   const reducedMotion = useReducedMotion();
+
+  const alphabeticallySorted = useMemo(
+    () => [...words].sort((a, b) => a.hy.localeCompare(b.hy, "hy")),
+    [words],
+  );
+
+  const availableLetters = useMemo(
+    () =>
+      new Set(
+        alphabeticallySorted
+          .map((word) => Array.from(word.hy)[0]?.toUpperCase())
+          .filter((letter): letter is string => Boolean(letter)),
+      ),
+    [alphabeticallySorted],
+  );
+
+  const visibleAlphabet = useMemo(
+    () => ARMENIAN_ALPHABET.filter((item) => availableLetters.has(item)),
+    [availableLetters],
+  );
 
   const filteredWords = useMemo(() => {
     const q = normalize(deferredQuery);
@@ -79,7 +90,7 @@ export function DictionaryExplorer() {
       );
       return q.split(/\s+/).every((part) => haystack.includes(part));
     });
-  }, [category, deferredQuery, letter]);
+  }, [alphabeticallySorted, category, deferredQuery, letter]);
 
   const shownWords = filteredWords.slice(0, visibleCount);
   const hasActiveFilters = Boolean(query) || category !== "all" || letter !== "all";

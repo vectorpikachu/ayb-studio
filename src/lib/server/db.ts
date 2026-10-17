@@ -53,12 +53,32 @@ async function ensureDatabase() {
 async function readDatabaseFile(): Promise<Database> {
   const raw = await fs.readFile(DATABASE_FILE, "utf8");
   try {
-    return JSON.parse(raw) as Database;
+    return normalizeDatabase(JSON.parse(raw) as Database);
   } catch {
     throw new Error(
       `Ayb 数据库文件损坏，无法解析。请检查 ${DATABASE_FILE}，或恢复到备份。`,
     );
   }
+}
+
+/**
+ * Keeps older local databases compatible when new fields are introduced.
+ * These defaults intentionally stay in memory; the next write persists them.
+ */
+function normalizeDatabase(database: Database): Database {
+  if (!Array.isArray(database.customWords)) database.customWords = [];
+  if (!Array.isArray(database.customLessons)) database.customLessons = [];
+
+  let hasAdmin = false;
+  for (const user of database.users) {
+    if (user.role !== "admin" && user.role !== "learner") user.role = "learner";
+    if (user.role === "admin") hasAdmin = true;
+  }
+  if (database.users.length > 0 && !hasAdmin) {
+    database.users[0]!.role = "admin";
+  }
+
+  return database;
 }
 
 export async function readDatabase(): Promise<Database> {

@@ -9,29 +9,31 @@ import {
   Sparkles,
 } from "lucide-react";
 import { Reveal } from "@/components/reveal";
-import {
-  grammarLessons,
-  grammarLevelGroups,
-  totalGrammarMinutes,
-} from "@/data/grammar";
 import { ARMENIAN_ALPHABET } from "@/data/dictionary";
 import { getCurrentUser } from "@/lib/server/auth";
+import { buildGrammarGroups, getContentGrammarLessons } from "@/lib/server/content";
 import { getGrammarProgressMap } from "@/lib/server/grammar";
 
 export const metadata: Metadata = {
   title: "语法",
   description:
-    "九节可实践的亚美尼亚语语法课：从字母、发音与人称，到名词、时态、格与后置词，每课都有例句和自测。",
+    "可实践的亚美尼亚语语法课：从字母、发音与人称，到名词、时态、格与后置词，每课都有例句和自测。",
 };
 
 export default async function GrammarPage() {
   const user = await getCurrentUser();
-  const progress = user ? await getGrammarProgressMap(user.id) : {};
+  const [lessons, progress] = await Promise.all([
+    getContentGrammarLessons(),
+    user ? getGrammarProgressMap(user.id) : Promise.resolve({}),
+  ]);
   const completedIds = new Set(Object.keys(progress));
-  const completedCount = grammarLessons.filter((lesson) => completedIds.has(lesson.id)).length;
+  const completedCount = lessons.filter((lesson) => completedIds.has(lesson.id)).length;
   const firstUnfinished =
-    grammarLessons.find((lesson) => !completedIds.has(lesson.id)) ?? grammarLessons[0];
-  const percent = Math.round((completedCount / grammarLessons.length) * 100);
+    lessons.find((lesson) => !completedIds.has(lesson.id)) ?? lessons[0];
+  const percent = Math.round((completedCount / lessons.length) * 100);
+  const totalMinutes = lessons.reduce((total, lesson) => total + lesson.minutes, 0);
+  const groups = buildGrammarGroups(lessons).filter((group) => group.lessons.length > 0);
+  const lessonNumber = new Map(lessons.map((lesson, index) => [lesson.id, index + 1]));
 
   return (
     <div className="pb-16">
@@ -53,7 +55,7 @@ export default async function GrammarPage() {
               是一张地图。
             </h1>
             <p className="mt-5 max-w-[510px] text-[12px] leading-[1.95] text-[var(--muted)]">
-              从 38 个字母到格的变化，九节短课，把规则放回具体的句子里。每节课都配有例句、对照表和一小组自测。
+              从 38 个字母到格的变化，{lessons.length} 节短课，把规则放回具体的句子里。每节课都配有例句、对照表和一小组自测。
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Link
@@ -79,12 +81,12 @@ export default async function GrammarPage() {
             <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-[9px] tracking-[0.05em] text-[var(--faint)]">
               <span className="flex items-center gap-1.5">
                 <BookOpen size={11} />
-                {grammarLessons.length} 节课
+                {lessons.length} 节课
               </span>
               <span className="h-3 w-[1px] bg-[var(--line)]" />
               <span className="flex items-center gap-1.5">
                 <Clock3 size={11} />
-                约 {totalGrammarMinutes} 分钟
+                约 {totalMinutes} 分钟
               </span>
               <span className="h-3 w-[1px] bg-[var(--line)]" />
               <span>A1 → B1 · 循序渐进</span>
@@ -112,7 +114,7 @@ export default async function GrammarPage() {
                     <div>
                       <p className="text-[26px] leading-none text-[var(--ink)]">
                         {completedCount}
-                        <span className="text-[13px] text-[var(--faint)]"> / {grammarLessons.length}</span>
+                        <span className="text-[13px] text-[var(--faint)]"> / {lessons.length}</span>
                       </p>
                       <p className="mt-1.5 text-[8px] tracking-[0.12em] text-[var(--faint)]">LESSONS</p>
                     </div>
@@ -121,14 +123,14 @@ export default async function GrammarPage() {
                 <div className="min-w-0">
                   <p className="text-[12px] font-medium text-[var(--ink)]">
                     {user
-                      ? completedCount === grammarLessons.length
-                        ? "九节课，已全部走完。"
+                      ? completedCount === lessons.length
+                        ? "全部课程，已全部走完。"
                         : "下一站，"
                       : "登录后保存你的路径。"}
                   </p>
                   <p className="mt-1.5 text-[10px] leading-relaxed text-[var(--muted)]">
                     {user
-                      ? completedCount === grammarLessons.length
+                      ? completedCount === lessons.length
                         ? "可以随时回来重读，或去复习里巩固词汇。"
                         : firstUnfinished.title
                       : "每节课的自测通过后，会在这里留下一个标记。"}
@@ -177,7 +179,7 @@ export default async function GrammarPage() {
             <div>
               <p className="eyebrow">Course map · Դասընթաց</p>
               <h2 className="mt-3 text-[28px] font-medium tracking-[-0.035em] text-[var(--ink)] md:text-[36px]">
-                九节课，一条慢慢变清晰的路。
+                {lessons.length} 节课，一条慢慢变清晰的路。
               </h2>
             </div>
             <p className="max-w-[260px] text-[10px] leading-[1.8] text-[var(--faint)] sm:text-right">
@@ -189,7 +191,7 @@ export default async function GrammarPage() {
         </Reveal>
 
         <div className="mt-9">
-          {grammarLevelGroups.map((group) => (
+          {groups.map((group) => (
             <div key={group.level} className="mb-8">
               <div className="flex items-center gap-3 border-b border-[var(--line)] pb-3">
                 <span className="rounded-full border border-[var(--line)] px-2.5 py-1 font-mono text-[8px] text-[var(--accent)]">
@@ -216,7 +218,7 @@ export default async function GrammarPage() {
                     >
                       <div className="flex items-center gap-2 md:block">
                         <span className="font-mono text-[10px] text-[var(--faint)]">
-                          {String(lesson.order).padStart(2, "0")}
+                          {String(lessonNumber.get(lesson.id) ?? 0).padStart(2, "0")}
                         </span>
                         {completed && <CheckCircle2 size={12} className="text-[var(--sage)] md:mt-2 md:block" />}
                         {isNext && (
@@ -293,3 +295,5 @@ export default async function GrammarPage() {
     </div>
   );
 }
+
+

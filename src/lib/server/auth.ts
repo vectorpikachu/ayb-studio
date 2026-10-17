@@ -32,6 +32,7 @@ export function toSessionUser(user: UserRecord): SessionUser {
     id: user.id,
     name: user.name,
     email: user.email,
+    role: user.role,
     createdAt: user.createdAt,
   };
 }
@@ -71,19 +72,27 @@ export async function registerUser(input: {
     name: input.name.trim(),
     email,
     passwordHash,
+    role: "learner",
     createdAt: new Date().toISOString(),
   };
 
-  const result = await updateDatabase<{ created: boolean }>((database) => {
+  const result = await updateDatabase<{ created: boolean; user?: UserRecord }>((database) => {
     if (database.users.some((candidate) => candidate.email === email)) {
       return { created: false };
     }
-    database.users.push(user);
-    return { created: true };
+
+    const configuredAdmin = process.env.AYB_ADMIN_EMAIL?.trim().toLowerCase();
+    const hasAdmin = database.users.some((candidate) => candidate.role === "admin");
+    const createdUser: UserRecord = {
+      ...user,
+      role: configuredAdmin === email || !hasAdmin ? "admin" : "learner",
+    };
+    database.users.push(createdUser);
+    return { created: true, user: createdUser };
   });
 
-  if (!result.created) return { ok: false, reason: "EMAIL_TAKEN" };
-  return { ok: true, user: toSessionUser(user) };
+  if (!result.created || !result.user) return { ok: false, reason: "EMAIL_TAKEN" };
+  return { ok: true, user: toSessionUser(result.user) };
 }
 
 export async function createSession(userId: string): Promise<string> {

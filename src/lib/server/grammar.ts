@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
-import { getGrammarLesson } from "@/data/grammar";
 import type { GrammarProgress } from "./db-types";
 import { readDatabase, updateDatabase } from "./db";
+import { getContentGrammarLesson } from "./content";
 
 export async function getGrammarProgressMap(
   userId: string,
@@ -22,9 +22,11 @@ export async function submitGrammarQuiz(
   lessonId: string,
   answers: number[],
 ): Promise<GrammarAttemptResult> {
-  const lesson = getGrammarLesson(lessonId);
+  const lesson = await getContentGrammarLesson(lessonId);
   if (!lesson) throw new Error("UNKNOWN_LESSON");
-  if (answers.length !== lesson.quiz.length) throw new Error("INVALID_ANSWERS");
+  if (lesson.quiz.length === 0 || answers.length !== lesson.quiz.length) {
+    throw new Error("INVALID_ANSWERS");
+  }
 
   const total = lesson.quiz.length;
   const score = lesson.quiz.reduce(

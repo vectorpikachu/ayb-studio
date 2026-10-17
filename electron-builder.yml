@@ -1,0 +1,50 @@
+appId: app.ayb.studio
+productName: Ayb
+copyright: Copyright © 2026 Ayb Studio
+directories:
+  output: release
+  buildResources: build
+files:
+  - electron/**/*
+  - build/icon.png
+  - package.json
+asar: true
+extraResources:
+  - from: .next/standalone
+    to: server
+    filter:
+      - "**/*"
+      - "!.data/**"
+      - "!.data"
+  - from: .next/static
+    to: server/.next/static
+  - from: public
+    to: server/public
+win:
+  icon: build/icon.ico
+  target:
+    - target: nsis
+      arch:
+        - x64
+  artifactName: ${productName}-${version}-win-${arch}.${ext}
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Ayb
+mac:
+  icon: build/icon.png
+  category: public.app-category.education
+  target:
+    - target: dmg
+      arch:
+        - x64
+        - arm64
+  artifactName: ${productName}-${version}-mac-${arch}.${ext}
+  hardenedRuntime: false
+  gatekeeperAssess: false
+  identity: null
+dmg:
+  title: ${productName} ${version}

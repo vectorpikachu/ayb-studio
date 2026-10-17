@@ -1,0 +1,22 @@
+{
+  "words": [
+    {
+      "id": "arevot-sunny",
+      "hy": "արևոտ",
+      "translit": "arevot",
+      "pos": "adjective",
+      "level": "A1",
+      "category": "nature",
+      "en": "sunny",
+      "ru": "солнечный",
+      "zh": "阳光明媚的",
+      "example": {
+        "hy": "Այսօր արևոտ օր է։",
+        "translit": "Aysor arevot or e.",
+        "en": "Today is a sunny day.",
+        "zh": "今天是阳光明媚的一天。"
+      },
+      "note": "արև（太阳）+ -ոտ 构成形容词，表示“充满阳光的”。"
+    }
+  ]
+}

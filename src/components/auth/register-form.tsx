@@ -29,7 +29,7 @@ function nextPath() {
   return "/";
 }
 
-export function RegisterForm() {
+export function RegisterForm({ firstRun = false }: { firstRun?: boolean }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -62,9 +62,15 @@ export function RegisterForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: name.trim(), email: email.trim(), password }),
       });
-      const data = (await response.json().catch(() => ({}))) as { error?: string };
+      const data = (await response.json().catch(() => ({}))) as {
+        error?: string;
+        user?: { role?: string };
+      };
       if (!response.ok) throw new Error(data.error ?? "注册失败，请稍后再试。");
-      window.location.assign(nextPath());
+      const next = nextPath();
+      const destination =
+        data.user?.role === "admin" && next === "/" ? "/admin?welcome=1" : next;
+      window.location.assign(destination);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "注册失败，请稍后再试。");
       setPending(false);
@@ -84,6 +90,16 @@ export function RegisterForm() {
         一个账户，保存所有学习痕迹。
         <span className="font-arm ml-1.5 text-[12px] text-[var(--faint)]">Սկսենք։</span>
       </p>
+
+      {firstRun && (
+        <div className="mt-6 flex items-start gap-2.5 rounded-xl border border-[color-mix(in_srgb,var(--sage)_32%,transparent)] bg-[color-mix(in_srgb,var(--sage)_7%,transparent)] p-3 text-[10px] leading-relaxed text-[var(--muted)]">
+          <ShieldCheck size={14} className="mt-0.5 shrink-0 text-[var(--sage)]" />
+          <p>
+            <strong className="font-medium text-[var(--ink)]">这是本机的第一个账户。</strong>{" "}
+            注册后你会成为管理员，可以在「内容管理」里导入词典和语法 JSON。
+          </p>
+        </div>
+      )}
 
       {error && (
         <div

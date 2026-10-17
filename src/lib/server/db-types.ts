@@ -1,4 +1,7 @@
 import type { ReviewState } from "@/lib/srs";
+import type { DictionaryWord } from "@/data/dictionary/types";
+import type { GrammarLesson } from "@/data/grammar/types";
+import type { UserRole } from "@/lib/auth-types";
 
 export type { ReviewGrade, ReviewState } from "@/lib/srs";
 
@@ -38,6 +41,7 @@ export type UserRecord = {
   name: string;
   email: string;
   passwordHash: string;
+  role: UserRole;
   createdAt: string;
 };
 
@@ -57,4 +61,6 @@ export type Database = {
   grammarProgress: Record<string, Record<string, GrammarProgress>>;
   writings: WritingRecord[];
   activities: ActivityRecord[];
+  customWords: DictionaryWord[];
+  customLessons: GrammarLesson[];
 };

@@ -99,7 +99,7 @@ export function LessonQuiz({
         <div>
           <p className="eyebrow">Check yourself · Ստուգենք</p>
           <h2 className="mt-3 text-[24px] font-medium tracking-[-0.03em] text-[var(--ink)]">
-            三题小测
+            {questions.length} 题小测
           </h2>
           <p className="mt-2 text-[10px] leading-relaxed text-[var(--muted)]">
             答对至少 {passMark} 题即可标记这节课为完成。

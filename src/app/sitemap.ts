@@ -1,9 +1,12 @@
 import type { MetadataRoute } from "next";
-import { grammarLessons } from "@/data/grammar";
+import { getContentGrammarLessons } from "@/lib/server/content";
 import { getSiteUrl } from "@/lib/server/site-url";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = await getSiteUrl();
+  const [baseUrl, grammarLessons] = await Promise.all([
+    getSiteUrl(),
+    getContentGrammarLessons(),
+  ]);
   const now = new Date();
   return [
     {

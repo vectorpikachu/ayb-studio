@@ -3,7 +3,15 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { BookOpen, LayoutGrid, Loader2, LogOut, PenLine, Repeat2 } from "lucide-react";
+import {
+  BookOpen,
+  LayoutGrid,
+  Loader2,
+  LogOut,
+  PenLine,
+  Repeat2,
+  ShieldCheck,
+} from "lucide-react";
 import type { SessionUser } from "@/lib/auth-types";
 
 const menuItems = [
@@ -19,6 +27,10 @@ export function UserMenu({ user }: { user: SessionUser }) {
   const [error, setError] = useState<string | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const initial = Array.from(user.name)[0]?.toUpperCase() ?? "A";
+  const items =
+    user.role === "admin"
+      ? [{ href: "/admin", label: "内容管理", icon: ShieldCheck }, ...menuItems]
+      : menuItems;
 
   useEffect(() => {
     if (!open) return;
@@ -99,12 +111,19 @@ export function UserMenu({ user }: { user: SessionUser }) {
                 {initial}
               </span>
               <div className="min-w-0">
-                <p className="truncate text-[11px] font-semibold text-[var(--ink)]">{user.name}</p>
+                <p className="flex items-center gap-1.5 truncate text-[11px] font-semibold text-[var(--ink)]">
+                  {user.name}
+                  {user.role === "admin" && (
+                    <span className="rounded-full border border-[color-mix(in_srgb,var(--sage)_38%,transparent)] px-1.5 py-0.5 text-[7px] font-medium tracking-[0.06em] text-[var(--sage)]">
+                      ADMIN
+                    </span>
+                  )}
+                </p>
                 <p className="mt-0.5 truncate text-[9px] text-[var(--faint)]">{user.email}</p>
               </div>
             </div>
             <div className="my-1 h-[1px] bg-[var(--line)]" />
-            {menuItems.map((item) => {
+            {items.map((item) => {
               const Icon = item.icon;
               return (
                 <Link

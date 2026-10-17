@@ -29,6 +29,8 @@ Ayb 是一个可运行、可注册、按用户保存进度的亚美尼亚语学�
 - **进度保存**：登录后小测通过（≥ 60%）才会写入完成记录；未通过不会误标完成。
 - **私人写作室**：创建、编辑、删除文章；草稿 / 完成状态；自动保存与 `Ctrl/⌘ + S`；中文对照；最多 8 个标签；预览；导出 `.txt`。
 - **账户系统**：注册、登录、退出、演示账号、HttpOnly 会话、30 天有效；每个用户的数据完全隔离。
+- **内容管理**：`/admin` 提供词典与语法 JSON 的批量导入、覆盖和删除；开发环境的演示账号是管理员，生产环境由首个注册账号或 `AYB_ADMIN_EMAIL` 指定管理员。
+- **桌面应用**：Electron 外壳会启动内置的 Next.js 生产服务，数据保存在系统用户目录；支持 Windows NSIS 安装包与 macOS DMG 构建。
 - **夜间 / 日间主题**、响应式布局、PWA manifest 与图标、自定义 404。
 - **零外部服务**：不需要数据库服务器、邮箱服务或第三方 API；本地 JSON 持久化，开箱即用。
 
@@ -89,6 +91,7 @@ cp .data/ayb.db.json backups/ayb-$(date +%F).json
 | `NEXT_PUBLIC_SITE_URL` | `http://localhost:3000` | 站点公开 URL，用于 metadata、sitemap。 |
 | `AYB_DATA_DIR` | `./.data` | JSON 数据库目录。Docker 中建议 `/data`。 |
 | `AYB_ENABLE_DEMO` | 非生产为 `true` | 是否播种并允许演示账号。生产建议关闭。 |
+| `AYB_ADMIN_EMAIL` | 空 | 指定管理员邮箱；该邮箱注册后获得管理员权限。未设置时，数据库中首个注册账号成为管理员。 |
 | `AYB_TIMEZONE` | 服务器本地时区 | 连续学习日历使用的 IANA 时区，如 `Asia/Shanghai`。 |
 
 复制 `.env.example` 作为起点。该文件不包含任何密钥。
@@ -99,6 +102,8 @@ cp .data/ayb.db.json backups/ayb-$(date +%F).json
 docker compose up -d --build
 ```
 
+> Docker 是可选的：本地开发和预览只需要 Node.js。容器方式适合部署到 VPS / NAS；容器使用独立的数据卷，不会读取项目里的 `.data`。
+
 打开 <http://localhost:3000>。数据库存储在命名卷 `ayb_data` 中，容器重建不会丢失。生产部署请：
 
 1. 把 `NEXT_PUBLIC_SITE_URL` 改成真实域名；
@@ -106,6 +111,33 @@ docker compose up -d --build
 3. 保持 `AYB_ENABLE_DEMO=false`；
 4. 定期备份 `ayb_data` 卷；
 5. 在反向代理层为登录接口配置共享限流。
+
+### 桌面应用（Electron）
+
+桌面版不依赖 Docker，也不要求用户安装 Node.js。Electron 主进程会在随机本地端口启动打包后的 Next.js standalone 服务，然后加载 `http://127.0.0.1:<port>`。
+
+```bash
+# 开发：自动启动 Next dev + Electron
+npm run desktop:dev
+
+# 只打未安装的目录，适合本机快速验证
+npm run desktop:dir
+
+# Windows NSIS 安装包（在 Windows 上执行）
+npm run desktop:win
+
+# macOS DMG（在 macOS 上执行）
+npm run desktop:mac
+```
+
+构建产物输出到 `release/`（已在 `.gitignore` 中忽略）。桌面版数据目录：
+
+- Windows：`%APPDATA%\Ayb\data`
+- macOS：`~/Library/Application Support/Ayb/data`
+
+桌面版首次启动没有演示账号，**第一个注册账号会成为管理员**，注册后会自动进入 `/admin` 并显示管理员引导。之后的普通账号通过 `?` 登录页进入学习空间。
+
+Windows 安装包与 macOS DMG 目前未做代码签名：Windows SmartScreen 可能提示“未知发布者”，macOS 需要右键“打开”或在系统设置中允许。GitHub Actions 的 `.github/workflows/desktop.yml` 会在 `v*` 标签或手动触发时构建 Windows 与 macOS 产物；macOS 任务使用 `--x64 --arm64` 生成两种架构的 DMG。
 
 ### 单实例说明
 
@@ -115,7 +147,7 @@ docker compose up -d --build
 
 - **词典**：`136` 个词，10 个主题。
 - **语法**：`9` 节课，约 `89` 分钟阅读量，27 道自测题。
-- **字体**：Noto Sans Armenian、Noto Serif Armenian、Manrope，均自托管，不依赖 Google Fonts 运行时。
+- **字体**：Manrope 负责拉丁与 UI，Noto Sans Armenian 负责亚美尼亚语正文，Noto Serif Armenian 负责亚美尼亚语标题与写作；中文回退到系统 UI 字体（PingFang SC / Microsoft YaHei）。前三者自托管，不依赖 Google Fonts 运行时。
 - **内容语言**：中文为主要学习界面；词条保留英语、俄语、中文三种释义，方便多语学习者。
 
 词表与语法说明是面向初学者的种子内容，例句为学习场景原创；**在正式商业发布前，建议请亚美尼亚语母语者做一轮翻译与语用校订**，特别是格变化、动词变位与习惯搭配。
@@ -125,6 +157,7 @@ docker compose up -d --build
 - Next.js 15（App Router）+ React 19 + TypeScript
 - Tailwind CSS 4 + 自定义 CSS 设计变量
 - Motion 弹性动画
+- Electron 桌面外壳：内置 standalone Next.js 服务，Windows NSIS / macOS DMG 打包
 - 本地 JSON 持久化 + 进程内写队列 + 原子写入
 - scrypt 密码哈希 + 随机 opaque 会话令牌（数据库只保存 SHA-256 摘要）
 - Node.js `Intl` 本地日期、时区可配置
@@ -132,8 +165,9 @@ docker compose up -d --build
 
 ### 设计要点
 
-- 深色纸张默认主题，可切到奶油色日间主题；
+- 浅色纸张默认主题，可切到深色夜间主题；
 - 导航胶囊、细线分隔、衬线亚美尼亚语标题、衬线写作界面；
+- 字体分工而非单一字族：Google Fonts 的 Noto Sans 按文字系统拆成独立子集，亚美尼亚语子集不含中文；中文需要单独的 CJK 字体（本项目的做法是交给系统字体）。因此拉丁用 Manrope、亚美尼亚语正文用 Noto Sans Armenian、标题用 Noto Serif Armenian；
 - 首页、词典、复习、语法、写作分别有不同的编辑节奏，但共享同一套排版和间距系统；
 - 对移动端做专门处理：复习与写作编辑器会隐藏底部 Dock，保留完整操作空间；
 - 支持 `prefers-reduced-motion`。
@@ -146,7 +180,8 @@ docker compose up -d --build
 - 写作与进度 API 全部检查会话和资源归属；已验证跨账户修改返回 404。
 - 演示账户在生产默认禁用，且登录接口会额外拒绝演示邮箱。
 - 应用的 API 不返回密码哈希；`.data` 永远不会被提交。
-- **尚未实现**：邮箱验证、忘记密码、管理员后台、公开文章分享、双因素认证。面向公众上线前请按需补齐，并准备隐私政策与用户协议。
+- 内容管理页与导入接口都检查 `role === "admin"`；非管理员访问页面得到 404，调用接口得到 403。生产环境请通过 `AYB_ADMIN_EMAIL` 明确指定管理员。
+- **尚未实现**：邮箱验证、忘记密码、公开文章分享、双因素认证。面向公众上线前请按需补齐，并准备隐私政策与用户协议。
 
 ## 常用快捷键
 
@@ -167,9 +202,11 @@ src/
     review/                  # 间隔复习
     grammar/                 # 语法索引与 [slug] 课程页
     write/                   # 私人写作室
+    admin/                   # 管理员内容工作台
     login/ register/         # 账户
     api/
       auth/                  # 注册 / 登录 / 演示 / 退出
+      admin/                 # 词条 / 课程导入与删除
       review/                # 复习队列与评分
       grammar/complete/      # 语法测验提交
       writings/              # 文章 CRUD
@@ -184,6 +221,13 @@ src/
 public/
   fonts/                     # 自托管字体 + OFL 许可文本
   icon-192.png  icon-512.png # PWA 图标
+electron/
+  main.cjs                   # 桌面主进程：启动本地服务、窗口与外部链接策略
+  preload.cjs                # 最小 contextBridge 暴露
+scripts/desktop-dev.mjs      # 开发用 Next + Electron 启动器
+electron-builder.yml         # Windows / macOS 打包配置
+build/                       # 桌面图标（png / ico）
+.github/workflows/desktop.yml # Windows + macOS 构建 CI
 tests/e2e.mjs                # 浏览器端冒烟测试
 ```
 
@@ -203,7 +247,7 @@ npm run qa
 AYB_BROWSER_PATH="/path/to/chrome" npm run qa
 ```
 
-测试会验证词典搜索、演示登录、复习翻面/评分、语法页与测验、写作新建/自动保存/删除。它会修改演示账户的数据，建议在临时数据目录或开发环境中运行。
+测试会验证浅色默认主题、词典搜索与长词自适应、演示登录、复习翻面/评分、语法页与测验、管理员模板下载/JSON 上传/删除，以及写作新建/自动保存/删除。它会修改演示账户的数据，建议在临时数据目录或开发环境中运行。
 
 ## 发布清单
 
@@ -214,6 +258,9 @@ AYB_BROWSER_PATH="/path/to/chrome" npm run qa
 - [ ] 补齐邮箱验证、密码重置、隐私政策与用户协议
 - [ ] 将本地 JSON 存储换为共享数据库（若需要多实例）
 - [ ] 在反向代理层限流与设置安全响应头
+- [ ] 为 Windows / macOS 安装包配置代码签名与公证
+- [ ] 在真实 macOS 设备上验证 DMG 与 Gatekeeper
+- [ ] 为桌面版添加自动更新与崩溃日志上报（尚未实现）
 - [ ] 选择并添加代码许可证
 
 ## 致谢与许可

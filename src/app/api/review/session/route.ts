@@ -1,5 +1,4 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { getWordById } from "@/data/dictionary";
 import { getCurrentUser } from "@/lib/server/auth";
 import { createReviewSession } from "@/lib/server/review";
 
@@ -14,10 +13,7 @@ export async function GET(request: NextRequest) {
     }
 
     const focusCandidate = request.nextUrl.searchParams.get("word") ?? undefined;
-    const focusWordId =
-      focusCandidate && getWordById(focusCandidate) ? focusCandidate : undefined;
-
-    const session = await createReviewSession(user.id, { focusWordId });
+    const session = await createReviewSession(user.id, { focusWordId: focusCandidate });
     return NextResponse.json(session, {
       headers: { "Cache-Control": "no-store" },
     });

@@ -144,6 +144,7 @@ export async function buildSeedDatabase(): Promise<Database> {
       name: DEMO_NAME,
       email: DEMO_EMAIL,
       passwordHash: await hashPassword(DEMO_PASSWORD),
+      role: "admin",
       createdAt: atDaysAgo(now, 42, 10),
     });
     reviewStates["demo-user"] = buildDemoReviewStates(now);
@@ -176,5 +177,7 @@ export async function buildSeedDatabase(): Promise<Database> {
     grammarProgress,
     writings,
     activities,
+    customWords: [],
+    customLessons: [],
   };
 }

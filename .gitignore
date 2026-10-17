@@ -10,6 +10,10 @@ out/
 next-env.d.ts
 *.tsbuildinfo
 
+# desktop packaging
+release/
+.electron-cache/
+
 # local data & uploads (never commit learner data)
 .data/
 .data-*/

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import {
   ArrowLeft,
@@ -22,9 +22,9 @@ import { AudioButton } from "@/components/audio-button";
 import { ArmenianWord } from "@/components/armenian-word";
 import {
   categoryMap,
-  getWordById,
   levelLabels,
   posLabels,
+  type DictionaryWord,
 } from "@/data/dictionary";
 import type { ReviewOverview, ReviewSessionCard, ReviewSessionPayload } from "@/lib/review-types";
 import { previewSchedule, formatDueDistance, type ReviewGrade } from "@/lib/srs";
@@ -102,7 +102,7 @@ export function ReviewStudio({
   const [flipped, setFlipped] = useState(false);
   const [pendingGrade, setPendingGrade] = useState<ReviewGrade | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [reviewedWordIds, setReviewedWordIds] = useState<string[]>([]);
+  const [reviewedWords, setReviewedWords] = useState<DictionaryWord[]>([]);
   const [gradeCounts, setGradeCounts] = useState<Record<ReviewGrade, number>>(emptyGradeCounts);
   const [roundLoading, setRoundLoading] = useState(false);
   const [focusNoteVisible, setFocusNoteVisible] = useState(
@@ -114,24 +114,16 @@ export function ReviewStudio({
   const stageRef = useRef<HTMLDivElement | null>(null);
 
   const current = cards[0];
-  const word = current ? getWordById(current.wordId) : undefined;
+  const word = current?.word;
   const category = word ? categoryMap[word.category] : undefined;
   const completed = sessionTotal - cards.length;
   const progress = sessionTotal > 0 ? Math.round((completed / sessionTotal) * 100) : 100;
   const finished = cards.length === 0;
-  const hasReviewed = reviewedWordIds.length > 0;
+  const hasReviewed = reviewedWords.length > 0;
   const accuracy =
-    reviewedWordIds.length > 0
-      ? Math.round(((gradeCounts[2] + gradeCounts[3]) / reviewedWordIds.length) * 100)
+    reviewedWords.length > 0
+      ? Math.round(((gradeCounts[2] + gradeCounts[3]) / reviewedWords.length) * 100)
       : 0;
-
-  const reviewedWords = useMemo(
-    () =>
-      reviewedWordIds
-        .map((id) => getWordById(id))
-        .filter((item): item is NonNullable<typeof item> => Boolean(item)),
-    [reviewedWordIds],
-  );
 
   async function gradeCard(grade: ReviewGrade) {
     if (!current || !word || pendingGrade !== null || !flipped) return;
@@ -154,7 +146,7 @@ export function ReviewStudio({
 
       setLastSchedule(data.state ? `下次复习：${formatDueDistance(data.state.due)}` : null);
       setGradeCounts((counts) => ({ ...counts, [grade]: counts[grade] + 1 }));
-      setReviewedWordIds((ids) => [...ids, gradedWord.id]);
+      setReviewedWords((items) => [...items, gradedWord]);
       setOverview((previous) => ({
         ...previous,
         dueCount: gradedCard.isNew ? previous.dueCount : Math.max(0, previous.dueCount - 1),
@@ -235,7 +227,7 @@ export function ReviewStudio({
       setSessionTotal(data.cards.length);
       setOverview(data.overview);
       setFlipped(false);
-      setReviewedWordIds([]);
+      setReviewedWords([]);
       setGradeCounts(emptyGradeCounts());
       setLastSchedule(null);
       setFocusNoteVisible(false);
@@ -366,12 +358,12 @@ export function ReviewStudio({
                         这一轮完成了。
                       </h2>
                       <p className="mx-auto mt-3 max-w-[380px] text-[11px] leading-[1.9] text-[var(--muted)]">
-                        {userName}，你今天和 {reviewedWordIds.length} 个词重新见了面。它们会在合适的时间，再回来。
+                        {userName}，你今天和 {reviewedWords.length} 个词重新见了面。它们会在合适的时间，再回来。
                       </p>
 
                       <div className="mx-auto mt-8 grid max-w-[470px] grid-cols-3 divide-x divide-[var(--line)] rounded-[16px] border border-[var(--line)] bg-[var(--surface)] py-4">
                         <div>
-                          <p className="text-[24px] leading-none text-[var(--ink)]">{reviewedWordIds.length}</p>
+                          <p className="text-[24px] leading-none text-[var(--ink)]">{reviewedWords.length}</p>
                           <p className="mt-1.5 text-[8px] text-[var(--faint)]">本轮词语</p>
                         </div>
                         <div>
@@ -775,3 +767,4 @@ export function ReviewStudio({
     </div>
   );
 }
+

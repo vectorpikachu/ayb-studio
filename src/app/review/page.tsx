@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { getWordById } from "@/data/dictionary";
 import { ReviewGuest } from "@/components/review-guest";
 import { ReviewStudio } from "@/components/review-studio";
 import { getCurrentUser } from "@/lib/server/auth";
+import { getContentWordById } from "@/lib/server/content";
 import { createReviewSession } from "@/lib/server/review";
 
 export const metadata: Metadata = {
@@ -23,7 +23,7 @@ export default async function ReviewPage({ searchParams }: ReviewPageProps) {
 
   const params = await searchParams;
   const rawWord = Array.isArray(params.word) ? params.word[0] : params.word;
-  const focusWordId = rawWord && getWordById(rawWord) ? rawWord : undefined;
+  const focusWordId = rawWord && (await getContentWordById(rawWord)) ? rawWord : undefined;
 
   const session = await createReviewSession(user.id, { focusWordId });
 

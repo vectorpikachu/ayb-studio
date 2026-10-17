@@ -13,11 +13,14 @@ import {
 import { GrammarBlocks } from "@/components/grammar/lesson-blocks";
 import { LessonQuiz } from "@/components/grammar/lesson-quiz";
 import {
-  getAdjacentLessons,
-  getGrammarLesson,
   grammarLevelLabels,
 } from "@/data/grammar";
 import { getCurrentUser } from "@/lib/server/auth";
+import {
+  findAdjacentLessons,
+  getContentGrammarLesson,
+  getContentGrammarLessons,
+} from "@/lib/server/content";
 import { getGrammarProgressMap } from "@/lib/server/grammar";
 
 type LessonPageProps = {
@@ -26,7 +29,7 @@ type LessonPageProps = {
 
 export async function generateMetadata({ params }: LessonPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const lesson = getGrammarLesson(slug);
+  const lesson = await getContentGrammarLesson(slug);
   if (!lesson) return { title: "语法课" };
   return {
     title: `${lesson.title} · 语法`,
@@ -36,13 +39,15 @@ export async function generateMetadata({ params }: LessonPageProps): Promise<Met
 
 export default async function GrammarLessonPage({ params }: LessonPageProps) {
   const { slug } = await params;
-  const lesson = getGrammarLesson(slug);
+  const lessons = await getContentGrammarLessons();
+  const lesson = lessons.find((candidate) => candidate.id === slug);
   if (!lesson) notFound();
 
+  const lessonIndex = lessons.findIndex((candidate) => candidate.id === lesson.id) + 1;
   const user = await getCurrentUser();
   const progressMap = user ? await getGrammarProgressMap(user.id) : {};
   const progress = progressMap[lesson.id] ?? null;
-  const { previous, next } = getAdjacentLessons(lesson.id);
+  const { previous, next } = findAdjacentLessons(lessons, lesson.id);
   const loginNextPath = `/grammar/${lesson.id}`;
 
   return (
@@ -58,7 +63,7 @@ export default async function GrammarLessonPage({ params }: LessonPageProps) {
           </Link>
           <div className="flex items-center gap-3 text-[9px] text-[var(--faint)]">
             <span className="font-mono">
-              LESSON {String(lesson.order).padStart(2, "0")} / 09
+              LESSON {String(lessonIndex).padStart(2, "0")} / {String(lessons.length).padStart(2, "0")}
             </span>
             <span className="h-3 w-[1px] bg-[var(--line)]" />
             <span>{lesson.level} · {grammarLevelLabels[lesson.level]}</span>
@@ -161,7 +166,6 @@ export default async function GrammarLessonPage({ params }: LessonPageProps) {
               isAuthenticated={Boolean(user)}
               loginNextPath={loginNextPath}
             />
-
             <nav className="mt-10 grid gap-3 border-t border-[var(--line)] pt-6 sm:grid-cols-2">
               {previous ? (
                 <Link
@@ -233,7 +237,7 @@ export default async function GrammarLessonPage({ params }: LessonPageProps) {
                   className="flex gap-2.5 border-t border-[var(--line)] pt-2.5 text-[10px] text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
                 >
                   <span className="font-mono text-[8px] text-[var(--faint)]">✦</span>
-                  三题小测
+                  {lesson.quiz.length} 题小测
                 </a>
               </nav>
             </div>
@@ -255,7 +259,7 @@ export default async function GrammarLessonPage({ params }: LessonPageProps) {
             </div>
 
             <div className="mt-3 flex items-center justify-between px-1 text-[8px] tracking-[0.06em] text-[var(--faint)]">
-              <span>LESSON {String(lesson.order).padStart(2, "0")}</span>
+              <span>LESSON {String(lessonIndex).padStart(2, "0")}</span>
               <span>{lesson.level} · AYB</span>
             </div>
           </aside>

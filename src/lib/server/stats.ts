@@ -1,5 +1,5 @@
-import { getWordById, words } from "@/data/dictionary";
-import { grammarLessons } from "@/data/grammar";
+import { words as baseWords } from "@/data/dictionary";
+import { grammarLessons as baseLessons } from "@/data/grammar";
 import type { ReviewOverview } from "@/lib/review-types";
 import type { Database } from "./db-types";
 import { readDatabase } from "./db";
@@ -16,11 +16,20 @@ function dateKey(date: Date): string {
 export function buildLearnerOverview(database: Database, userId: string): ReviewOverview {
   const now = Date.now();
   const states = database.reviewStates[userId] ?? {};
-  const validStates = Object.entries(states).filter(([wordId]) => Boolean(getWordById(wordId)));
+  const knownWordIds = new Set([
+    ...baseWords.map((word) => word.id),
+    ...database.customWords.map((word) => word.id),
+  ]);
+  const validStates = Object.entries(states).filter(([wordId]) => knownWordIds.has(wordId));
   const dueCount = validStates.filter(
     ([, state]) => new Date(state.due).getTime() <= now,
   ).length;
   const learnedCount = validStates.length;
+
+  const knownLessonIds = new Set([
+    ...baseLessons.map((lesson) => lesson.id),
+    ...database.customLessons.map((lesson) => lesson.id),
+  ]);
 
   const activities = database.activities.filter((activity) => activity.userId === userId);
   const activeDays = new Set(activities.map((activity) => dateKey(new Date(activity.at))));
@@ -40,17 +49,20 @@ export function buildLearnerOverview(database: Database, userId: string): Review
   ).length;
 
   const grammarProgress = database.grammarProgress[userId] ?? {};
-  const grammarCompleted = grammarLessons.filter((lesson) => Boolean(grammarProgress[lesson.id])).length;
+  const grammarCompleted = Object.keys(grammarProgress).filter((id) =>
+    knownLessonIds.has(id),
+  ).length;
 
   return {
     dueCount,
-    newCount: Math.max(0, words.length - learnedCount),
+    newCount: Math.max(0, knownWordIds.size - learnedCount),
     learnedCount,
-    totalWords: words.length,
+    totalWords: knownWordIds.size,
     streak,
     reviewedToday,
     totalReviews: activities.filter((activity) => activity.type === "review").length,
     grammarCompleted,
+    grammarTotal: knownLessonIds.size,
     writingCount: database.writings.filter((writing) => writing.userId === userId).length,
   };
 }

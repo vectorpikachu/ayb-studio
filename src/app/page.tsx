@@ -13,8 +13,8 @@ import { AudioButton } from "@/components/audio-button";
 import { ArmenianWord } from "@/components/armenian-word";
 import { Reveal } from "@/components/reveal";
 import { getWordOfTheDay, posLabels } from "@/data/dictionary";
-import { grammarLessons } from "@/data/grammar";
 import { getCurrentUser } from "@/lib/server/auth";
+import { getContentWords } from "@/lib/server/content";
 import { getLearnerOverview } from "@/lib/server/stats";
 
 const features = [
@@ -135,9 +135,12 @@ const features = [
 ];
 
 export default async function HomePage() {
-  const word = getWordOfTheDay();
   const user = await getCurrentUser();
-  const overview = user ? await getLearnerOverview(user.id) : null;
+  const [allWords, overview] = await Promise.all([
+    getContentWords(),
+    user ? getLearnerOverview(user.id) : Promise.resolve(null),
+  ]);
+  const word = getWordOfTheDay(new Date(), allWords);
 
   return (
     <div className="overflow-hidden">
@@ -216,7 +219,7 @@ export default async function HomePage() {
                       <span className="font-arm text-[13px] text-[var(--muted)]">
                         {overview.grammarCompleted}
                       </span>
-                      / {grammarLessons.length} 语法
+                      / {overview.grammarTotal} 语法
                     </Link>
                     <span className="h-3 w-[1px] bg-[var(--line)]" />
                     <Link href="/review" className="transition-colors hover:text-[var(--ink)]">

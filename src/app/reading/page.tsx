@@ -112,11 +112,11 @@ export default async function ReadingPage() {
             <div>
               <p className="eyebrow">Texts · Տեքստեր</p>
               <h2 className="mt-3 text-[28px] font-medium tracking-[-0.035em] text-[var(--ink)] md:text-[36px]">
-                从这一篇开始。
+                三篇，三种读法。
               </h2>
             </div>
             <p className="max-w-[260px] text-[10px] leading-[1.8] text-[var(--faint)] sm:text-right">
-              篇幅会慢慢变长。
+              从日常生活到诗，再到 19 世纪的长句。
               <br />
               每篇都保留生词和语法索引。
             </p>

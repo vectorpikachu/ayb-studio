@@ -71,7 +71,7 @@ export function ReadingParagraphs({ paragraphs }: { paragraphs: ReadingParagraph
               <div className="flex items-start justify-between gap-3">
                 <p
                   className={cn(
-                    "min-w-0 flex-1 text-[var(--ink)]",
+                    "min-w-0 flex-1 whitespace-pre-line text-[var(--ink)]",
                     script === "hand"
                       ? "font-hand text-[25px] leading-[2] md:text-[28px]"
                       : "font-arm text-[22px] leading-[1.85] md:text-[25px]",
@@ -89,13 +89,13 @@ export function ReadingParagraphs({ paragraphs }: { paragraphs: ReadingParagraph
                   <p className="text-[8px] font-semibold tracking-[0.14em] text-[var(--faint)]">
                     MODERN · 现代亚美尼亚语
                   </p>
-                  <p className="mt-1.5 font-arm text-[15px] leading-[1.75] text-[var(--muted)]" lang="hy">
+                  <p className="mt-1.5 whitespace-pre-line font-arm text-[15px] leading-[1.75] text-[var(--muted)]" lang="hy">
                     {paragraph.modernHy}
                   </p>
                 </div>
               )}
               {showZh && (
-                <p className="mt-2.5 border-l border-[var(--accent)] pl-3.5 text-[11px] leading-[1.9] text-[var(--muted)]">
+                <p className="mt-2.5 whitespace-pre-line border-l border-[var(--accent)] pl-3.5 text-[11px] leading-[1.9] text-[var(--muted)]">
                   {paragraph.zh}
                 </p>
               )}

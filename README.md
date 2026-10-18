@@ -213,10 +213,11 @@ tests/e2e.mjs                # 浏览器端冒烟测试
 
 ## 测试
 
-应用包含一个 Playwright Core 的浏览器冒烟测试。需要先启动开发服务器，并准备本机 Edge 或 Chrome：
+应用包含一个 Playwright Core 的浏览器冒烟测试。建议先跑生产构建，并准备本机 Edge 或 Chrome：
 
 ```bash
-npm run dev
+npm run build
+npm start
 # 另一个终端
 npm run qa
 ```
@@ -228,6 +229,12 @@ AYB_BROWSER_PATH="/path/to/chrome" npm run qa
 ```
 
 测试会验证浅色默认主题、词典搜索与长词自适应、演示登录、复习翻面/评分、语法页与测验、课文阅读与印刷/手写切换、文化栏目、管理员模板下载/JSON 上传/删除、课文/文化编辑器，以及写作新建/自动保存/删除。它会修改演示账户的数据，建议在临时数据目录或开发环境中运行。
+
+## 开发文档
+
+- [`AGENT.md`](AGENT.md) — 给 AI agent / 新维护者的工作手册、用户准则、完成定义
+- [`memory.md`](memory.md) — 项目记忆入口
+- [`memory/`](memory/README.md) — 用户偏好、内容与排版、工程与 QA、开发复盘
 
 ## 发布清单
 

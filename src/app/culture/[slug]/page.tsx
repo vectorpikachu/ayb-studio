@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, ArrowUpRight, Compass } from "lucide-react";
 import { cultureCategoryLabels } from "@/data/culture";
+import { HandText } from "@/components/hand-text";
 import { getContentCultureEntries } from "@/lib/server/content";
 
 type CultureDetailProps = {
@@ -62,8 +63,8 @@ export default async function CultureDetailPage({ params }: CultureDetailProps) 
               <h1 className="mt-4 text-[38px] font-medium leading-[1.1] tracking-[-0.045em] text-[var(--ink)] md:text-[52px]">
                 {entry.title}
               </h1>
-              <p className="mt-3 font-hand text-[34px] leading-[1.3] text-[var(--accent)] md:text-[42px]" lang="hy">
-                {entry.titleHy}
+              <p className="mt-3 text-[34px] leading-[1.3] text-[var(--accent)] md:text-[42px]">
+                <HandText text={entry.titleHy} />
               </p>
               <p className="mt-3 text-[10px] tracking-[0.04em] text-[var(--muted)]">{entry.subtitle}</p>
               <p className="mt-4 max-w-[660px] text-[12px] leading-[1.95] text-[var(--muted)]">

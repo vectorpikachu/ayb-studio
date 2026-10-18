@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight, Compass, Landmark, Sparkles } from "lucide-react";
 import { Reveal } from "@/components/reveal";
+import { HandText } from "@/components/hand-text";
 import {
   cultureCategoryLabels,
   cultureCategories,
@@ -170,8 +171,8 @@ export default async function CulturePage({ searchParams }: CulturePageProps) {
                 <h3 className="mt-4 text-[21px] font-medium tracking-[-0.025em] text-[var(--ink)] md:text-[24px]">
                   {entry.title}
                 </h3>
-                <p className="mt-1.5 font-hand text-[25px] leading-[1.35] text-[var(--accent)]" lang="hy">
-                  {entry.titleHy}
+                <p className="mt-1.5 text-[25px] leading-[1.35] text-[var(--accent)]">
+                  <HandText text={entry.titleHy} />
                 </p>
                 <p className="mt-3 text-[11px] leading-[1.9] text-[var(--muted)]">{entry.summary}</p>
                 <div className="mt-4 flex items-center justify-between border-t border-[var(--line)] pt-3 text-[8px] tracking-[0.06em] text-[var(--faint)]">

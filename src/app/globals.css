@@ -1,7 +1,10 @@
 @import "tailwindcss";
 
 /* Two hands, one family: Poqrik for the Armenian letters, First Time Writing
-   for Latin words and punctuation. unicode-range keeps the split automatic. */
+   for Latin words and punctuation. unicode-range keeps the split automatic.
+   Digits are intentionally left out of both ranges: Poqrik has no numerals,
+   and Latin handwritten digits next to Armenian cursive look mismatched.
+   They fall through to Noto Sans Armenian, so dates such as 1915 stay print. */
 @font-face {
   font-family: "Ayb Hand";
   font-style: normal;
@@ -17,7 +20,8 @@
   font-weight: 400;
   font-display: swap;
   src: url("/fonts/first-time-writing.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+2000-206F, U+20AC;
+  unicode-range: U+0020-002F, U+003A-0040, U+0041-005A, U+005B-0060, U+0061-007A,
+    U+007B-007E, U+00A0-00FF, U+2000-206F, U+20AC;
 }
 
 @theme inline {
@@ -201,6 +205,7 @@
   font-family: var(--font-hand);
   font-weight: 400;
   font-synthesis: none;
+  font-variant-numeric: lining-nums tabular-nums;
   letter-spacing: 0;
 }
 

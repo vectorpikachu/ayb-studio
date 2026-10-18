@@ -213,8 +213,10 @@
   letter-spacing: 0;
   /* Poqrik's cursive entry strokes start left of the em box (լ is -0.15em,
      some capitals reach -0.3em). Without this the first letter is cut off by
-     overflow-hidden cards and truncated lines. */
+     overflow-hidden cards and truncated lines. The exit strokes drop just as
+     far below the line box, so reserve space underneath too. */
   padding-inline-start: 0.22em;
+  padding-block-end: 0.26em;
 }
 
 .eyebrow {

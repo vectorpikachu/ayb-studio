@@ -24,6 +24,10 @@ export function ArmenianWord({
       style={{
         fontSize: `clamp(${min}px, ${relativeSize}cqw, ${max}px)`,
         lineHeight: 0.98,
+        // Armenian descenders (լ, ղ, ձ) reach ~0.24em below the baseline, more
+        // than a 0.98 line box leaves, so reserve room instead of letting the
+        // next row paint over the tail.
+        paddingBottom: "0.16em",
       }}
       title={text}
     >

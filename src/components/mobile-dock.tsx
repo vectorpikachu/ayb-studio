@@ -37,7 +37,7 @@ export function MobileDock() {
             key={item.href}
             href={item.href}
             className={cn(
-              "relative flex min-w-[44px] flex-col items-center gap-0.5 rounded-2xl py-1.5 text-[8px] font-medium tracking-wide transition-colors",
+              "relative flex min-w-[44px] flex-col items-center gap-0.5 rounded-2xl py-1.5 text-[9px] font-medium tracking-wide transition-colors",
               active ? "text-[var(--ink)]" : "text-[var(--faint)]",
             )}
           >

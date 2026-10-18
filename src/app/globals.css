@@ -11,6 +11,10 @@
   font-weight: 400;
   font-display: swap;
   src: url("/fonts/poqrik-dzeragir.woff2") format("woff2");
+  /* Poqrik's lowercase sits at 0.34em against the old hand's 0.47em, so the
+     same font-size reads noticeably smaller. Nudge it back up, but keep the
+     capitals (0.68em) from overpowering the line. */
+  size-adjust: 112%;
   unicode-range: U+0530-058F;
 }
 
@@ -207,6 +211,10 @@
   font-synthesis: none;
   font-variant-numeric: lining-nums tabular-nums;
   letter-spacing: 0;
+  /* Poqrik's cursive entry strokes start left of the em box (լ is -0.15em,
+     some capitals reach -0.3em). Without this the first letter is cut off by
+     overflow-hidden cards and truncated lines. */
+  padding-inline-start: 0.22em;
 }
 
 .eyebrow {

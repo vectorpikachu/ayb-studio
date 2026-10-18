@@ -34,6 +34,8 @@ export type ReadingText = {
   minutes: number;
   title: string;
   titleHy: string;
+  /** Optional line breaks for long titles on narrow screens. */
+  titleLines?: string[];
   subtitle: string;
   description: string;
   author?: string;

@@ -33,7 +33,7 @@ export default async function CultureDetailPage({ params }: CultureDetailProps) 
   const category = cultureCategoryLabels[entry.category];
 
   return (
-    <div className="pb-20">
+    <div className="pb-28 md:pb-20">
       <div className="container-ayb pt-[108px] md:pt-[132px]">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <Link

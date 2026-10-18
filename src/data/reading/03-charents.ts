@@ -6,6 +6,7 @@ export const charentsHayastani: ReadingText = {
   level: "B1",
   minutes: 16,
   title: "我爱我甜蜜的亚美尼亚",
+  titleLines: ["我爱我甜蜜的", "亚美尼亚"],
   titleHy: "Ես իմ անուշ Հայաստանի",
   subtitle: "恰连茨：把祖国写成一个可以尝到的词",
   description:

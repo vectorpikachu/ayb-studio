@@ -44,8 +44,8 @@ export default async function ReadingTextPage({ params }: ReadingPageProps) {
   const paragraphCount = text.paragraphs.length;
 
   return (
-    <div className="pb-20">
-      <div className="container-ayb pt-[108px] md:pt-[132px]">
+    <div className="pb-28 md:pb-20">
+      <div className="container-ayb pt-[100px] md:pt-[132px]">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <Link
             href="/reading"
@@ -70,14 +70,25 @@ export default async function ReadingTextPage({ params }: ReadingPageProps) {
           </div>
         </div>
 
-        <header className="relative mt-8 overflow-hidden border-b border-[var(--line)] pb-9 md:mt-10 md:pb-12">
+        <header className="relative mt-6 overflow-hidden border-b border-[var(--line)] pb-7 md:mt-10 md:pb-12">
           <div className="pointer-events-none absolute right-0 top-0 hidden h-40 w-40 rounded-full border border-[var(--line)] md:block" aria-hidden />
           <div className="pointer-events-none absolute right-16 top-12 hidden h-16 w-16 rounded-full border border-dashed border-[var(--line)] md:block" aria-hidden />
           <div className="relative z-10 grid items-end gap-8 md:grid-cols-[1fr_auto]">
             <div>
               <p className="eyebrow">Reading · Ընթերցանություն</p>
               <h1 className="mt-4 text-[38px] font-medium leading-[1.1] tracking-[-0.045em] text-[var(--ink)] md:text-[52px]">
-                {text.title}
+                {text.titleLines ? (
+                  <>
+                    {text.titleLines.map((line, lineIndex) => (
+                      <span key={line}>
+                        {line}
+                        {lineIndex < text.titleLines!.length - 1 && <br className="sm:hidden" />}
+                      </span>
+                    ))}
+                  </>
+                ) : (
+                  text.title
+                )}
               </h1>
               <p className="mt-3 font-hand text-[34px] leading-[1.3] text-[var(--accent)] md:text-[42px]" lang="hy">
                 {text.titleHy}

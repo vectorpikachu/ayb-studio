@@ -34,8 +34,8 @@ export default async function ReadingPage() {
   const totalWords = readingTexts.reduce((total, text) => total + countArmenianWords(text), 0);
 
   return (
-    <div className="pb-20">
-      <section className="container-ayb relative overflow-hidden pt-[112px] md:pt-[140px]">
+    <div className="pb-28 md:pb-20">
+      <section className="container-ayb relative overflow-hidden pt-[104px] md:pt-[140px]">
         <span
           className="pointer-events-none absolute -right-6 top-14 hidden select-none font-display text-[280px] leading-none text-[var(--ink)] opacity-[0.025] lg:block"
           aria-hidden
@@ -47,15 +47,15 @@ export default async function ReadingPage() {
         <div className="grid items-end gap-10 lg:grid-cols-[1fr_300px]">
           <Reveal>
             <p className="eyebrow">Reading room · Ընթերցարան</p>
-            <h1 className="mt-5 max-w-[700px] text-[42px] font-medium leading-[1.07] tracking-[-0.05em] text-[var(--ink)] md:text-[62px]">
+            <h1 className="mt-4 max-w-[700px] text-[42px] font-medium leading-[1.07] tracking-[-0.05em] text-[var(--ink)] md:text-[62px]">
               把语言，
               <br />
               读成一整段。
             </h1>
-            <p className="mt-5 max-w-[540px] text-[12px] leading-[1.95] text-[var(--muted)]">
+            <p className="mt-4 max-w-[540px] text-[12px] leading-[1.95] text-[var(--muted)]">
               单词和语法点最终要回到段落里。每篇课文都带中文对照、生词表、语法点和朗读；先读意思，再拆句子。
             </p>
-            <div className="mt-7 flex flex-wrap gap-3">
+            <div className="mt-6 flex flex-wrap gap-3">
               <Link href={`/reading/${readingTexts[0].id}`} className="btn btn-primary">
                 从第一篇开始
                 <ArrowRight size={14} />
@@ -65,7 +65,7 @@ export default async function ReadingPage() {
                 <ArrowUpRight size={13} />
               </Link>
             </div>
-            <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-[9px] tracking-[0.05em] text-[var(--faint)]">
+            <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-[9px] tracking-[0.05em] text-[var(--faint)]">
               <span className="flex items-center gap-1.5">
                 <BookOpenText size={11} />
                 {readingTexts.length} 篇课文
@@ -78,9 +78,12 @@ export default async function ReadingPage() {
               <span className="h-3 w-[1px] bg-[var(--line)]" />
               <span>A2 起 · 逐渐加长</span>
             </div>
+            <p className="mt-4 max-w-[480px] text-[10px] leading-[1.8] text-[var(--faint)] lg:hidden">
+              建议顺序：先读印刷体 → 打开中文 → 最后切手写。
+            </p>
           </Reveal>
 
-          <Reveal delay={0.08}>
+          <Reveal delay={0.08} className="hidden lg:block">
             <div className="surface-card relative overflow-hidden rounded-[26px] p-5 md:p-6">
               <div
                 className="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full opacity-25 blur-3xl"
@@ -106,7 +109,7 @@ export default async function ReadingPage() {
         </div>
       </section>
 
-      <section className="container-ayb mt-14 md:mt-20">
+      <section className="container-ayb mt-8 md:mt-20">
         <Reveal>
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
@@ -123,7 +126,7 @@ export default async function ReadingPage() {
           </div>
         </Reveal>
 
-        <div className="mt-9 grid gap-4">
+        <div className="mt-7 grid gap-4 md:mt-9">
           {readingTexts.map((text, index) => {
             const words = countArmenianWords(text);
             return (

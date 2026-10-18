@@ -84,7 +84,12 @@ export function GrammarBlocks({ blocks }: { blocks: GrammarBlock[] }) {
           return (
             <div key={index} className="my-6">
               {block.caption && <p className="eyebrow mb-2.5">{block.caption}</p>}
-              <div className="hide-scrollbar glass-soft overflow-x-auto rounded-[20px]">
+              <div
+                className="hide-scrollbar glass-soft overflow-x-auto rounded-[20px]"
+                role="region"
+                aria-label="可左右滚动查看的表格"
+                tabIndex={0}
+              >
                 <table className="w-full min-w-[540px] border-collapse text-left">
                   <thead>
                     <tr className="border-b border-[var(--line)] bg-[color-mix(in_srgb,var(--surface-2)_42%,transparent)]">
@@ -120,6 +125,9 @@ export function GrammarBlocks({ blocks }: { blocks: GrammarBlock[] }) {
                   </tbody>
                 </table>
               </div>
+              <p className="mt-1.5 text-[8px] leading-[1.6] text-[var(--faint)] md:hidden">
+                左右滑动查看完整表格
+              </p>
             </div>
           );
         }

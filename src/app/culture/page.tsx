@@ -37,8 +37,8 @@ export default async function CulturePage({ searchParams }: CulturePageProps) {
   }));
 
   return (
-    <div className="pb-20">
-      <section className="container-ayb relative overflow-hidden pt-[112px] md:pt-[140px]">
+    <div className="pb-28 md:pb-20">
+      <section className="container-ayb relative overflow-hidden pt-[104px] md:pt-[140px]">
         <span
           className="pointer-events-none absolute -right-8 top-14 hidden select-none font-display text-[280px] leading-none text-[var(--ink)] opacity-[0.025] lg:block"
           aria-hidden
@@ -50,15 +50,15 @@ export default async function CulturePage({ searchParams }: CulturePageProps) {
         <div className="grid items-end gap-10 lg:grid-cols-[1fr_300px]">
           <Reveal>
             <p className="eyebrow">Culture atlas · Մշակույթ</p>
-            <h1 className="mt-5 max-w-[720px] text-[42px] font-medium leading-[1.07] tracking-[-0.05em] text-[var(--ink)] md:text-[62px]">
+            <h1 className="mt-4 max-w-[720px] text-[42px] font-medium leading-[1.07] tracking-[-0.05em] text-[var(--ink)] md:text-[62px]">
               一个国家，
               <br />
               不止一个入口。
             </h1>
-            <p className="mt-5 max-w-[560px] text-[12px] leading-[1.95] text-[var(--muted)]">
+            <p className="mt-4 max-w-[560px] text-[12px] leading-[1.95] text-[var(--muted)]">
               历史、文化、人物与地理。不是百科式的年表，而是几条可以走进去的路线：一块石头、一种声音、一个人、一座山。
             </p>
-            <div className="mt-7 flex flex-wrap gap-3">
+            <div className="mt-6 flex flex-wrap gap-3">
               <Link href="/culture?category=history" className="btn btn-primary">
                 从历史开始
                 <ArrowRight size={14} />
@@ -68,7 +68,7 @@ export default async function CulturePage({ searchParams }: CulturePageProps) {
                 <ArrowUpRight size={13} />
               </Link>
             </div>
-            <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-[9px] tracking-[0.05em] text-[var(--faint)]">
+            <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-[9px] tracking-[0.05em] text-[var(--faint)]">
               <span className="flex items-center gap-1.5">
                 <Landmark size={11} />
                 {entries.length} 个条目
@@ -83,7 +83,7 @@ export default async function CulturePage({ searchParams }: CulturePageProps) {
             </div>
           </Reveal>
 
-          <Reveal delay={0.08}>
+          <Reveal delay={0.08} className="hidden lg:block">
             <div className="surface-card relative overflow-hidden rounded-[26px] p-5 md:p-6">
               <div
                 className="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full opacity-25 blur-3xl"
@@ -111,7 +111,7 @@ export default async function CulturePage({ searchParams }: CulturePageProps) {
         </div>
       </section>
 
-      <section className="container-ayb mt-14 md:mt-20">
+      <section className="container-ayb mt-8 md:mt-20">
         <Reveal>
           <div className="flex flex-col justify-between gap-5 border-b border-[var(--line)] pb-5">
             <div>
@@ -153,7 +153,7 @@ export default async function CulturePage({ searchParams }: CulturePageProps) {
           </div>
         </Reveal>
 
-        <div className="mt-7 grid gap-3 md:grid-cols-2">
+        <div className="mt-5 grid gap-3 md:mt-7 md:grid-cols-2">
           {visible.map((entry, index) => (
             <Reveal key={entry.id} delay={Math.min(index * 0.035, 0.2)}>
               <Link

@@ -233,6 +233,7 @@ const readingTextSchema = z.object({
   level: z.enum(["A1", "A2", "B1", "B2"]),
   minutes: z.number().int().min(1).max(180),
   title: shortText(300),
+  titleLines: z.array(shortText(300)).min(1).max(4).optional(),
   titleHy: shortText(300),
   subtitle: shortText(400),
   description: shortText(4000),

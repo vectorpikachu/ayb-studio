@@ -85,7 +85,7 @@ export const alphabetAndSounds: GrammarLesson = {
         {
           type: "note",
           title: "印刷体与手写体",
-          text: "每张字母卡上有两行：上面是 Noto Sans Armenian 的印刷体，下面红色的小字是 Poqrik dzeragir 的规整连笔手写体。亚美尼亚语的手写体（շղագիր）和印刷体差别很大，这里是一个清晰、可辨认的样本，不是唯一标准。先熟悉印刷体，再慢慢读手写。",
+          text: "每张字母卡上有两行：上面是 Noto Sans Armenian 的印刷体，下面红色的小字是 Poqrik dzeragir 的大写 + 小写手写体。亚美尼亚语的手写体（շղագիր）和印刷体差别很大，这里是一个清晰、可辨认的样本，不是唯一标准。先熟悉印刷体，再慢慢读手写。",
         },
         {
           type: "note",

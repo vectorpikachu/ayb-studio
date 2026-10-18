@@ -160,7 +160,8 @@ export function GrammarBlocks({ blocks }: { blocks: GrammarBlock[] }) {
                       <span className="ml-1 text-[17px] text-[var(--muted)]">{letter.lower}</span>
                     </p>
                     <p className="mt-1.5 font-hand text-[24px] leading-none text-[var(--accent)]" lang="hy">
-                      {letter.lower}
+                      <span>{letter.upper}</span>
+                      <span className="ml-1.5 text-[20px]">{letter.lower}</span>
                     </p>
                     <p className="mt-2 truncate text-[8px] text-[var(--faint)]" lang="hy">
                       {letter.name}

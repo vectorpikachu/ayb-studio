@@ -4,6 +4,7 @@ import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { MobileDock } from "@/components/mobile-dock";
+import { SpeechToast } from "@/components/speech-toast";
 import { getCurrentUser } from "@/lib/server/auth";
 
 const notoSans = localFont({
@@ -108,6 +109,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           <SiteFooter user={user} />
         </div>
         <MobileDock />
+        <SpeechToast />
       </body>
     </html>
   );

@@ -108,7 +108,7 @@ export function ReadingParagraphs({ paragraphs }: { paragraphs: ReadingParagraph
           ))}
         </div>
         <p className="mt-8 border-t border-[var(--line)] pt-4 text-[9px] leading-[1.8] text-[var(--faint)]">
-          手写模式使用 Poqrik dzeragir 连笔字体；它和印刷体差别较大，适合练习辨认。朗读由浏览器语音合成提供。
+          手写模式使用 Poqrik dzeragir 连笔字体；它和印刷体差别较大，适合练习辨认。朗读优先播放预生成的参考音；若缺音频，回退到浏览器语音合成。
         </p>
       </div>
     </div>

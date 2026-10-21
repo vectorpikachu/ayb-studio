@@ -32,3 +32,4 @@ Thumbs.db
 
 # local agent tooling
 .codebuddy/
+.qoder/

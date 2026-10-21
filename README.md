@@ -100,7 +100,7 @@ npm start
 
 数据默认存放在项目根目录的 `.data/ayb.sqlite`（SQLite，WAL 模式）。该目录已被 `.gitignore` 排除，**不要提交真实用户数据**。旧版 `.data/ayb.db.json` 会在首次启动时自动导入一次，原文件保留为备份，之后不再读取。
 
-生产环境使用 HTTPS 时，会话 Cookie 会自动带上 `Secure`；请勿在没有 TLS 的公网地址上直接运行。
+会话 Cookie 的 `Secure` 属性由 `AYB_COOKIE_SECURE` 控制：默认 `auto` 按请求协议判断，HTTPS 下自动加 `Secure`，备案前用 HTTP/IP 直接访问也能正常登录；正式启用 HTTPS 后建议显式设为 `true`，`never` 只用于内网调试。生产环境应尽量走 TLS。
 
 ```bash
 # 备份（建议先停止服务，确保 WAL 已落盘）
@@ -118,6 +118,7 @@ cp .data/ayb.sqlite backups/ayb-$(date +%F).sqlite
 | `AYB_ENABLE_DEMO` | 非生产为 `true` | 是否播种并允许演示账号。生产建议关闭。 |
 | `AYB_ADMIN_EMAIL` | 空 | 指定管理员邮箱；该邮箱注册后获得管理员权限。未设置时，数据库中首个注册账号成为管理员。 |
 | `AYB_TIMEZONE` | 服务器本地时区 | 连续学习日历使用的 IANA 时区，如 `Asia/Shanghai`。 |
+| `AYB_COOKIE_SECURE` | `auto` | 会话 Cookie 的 `Secure` 属性。`auto` 按请求协议判断（HTTP 访问仍可登录）；`always`/`true` 强制加 `Secure`，正式启用 HTTPS 后建议显式设置；`never`/`false` 强制不加。 |
 
 复制 `.env.example` 作为起点。该文件不包含任何密钥。
 
@@ -242,7 +243,7 @@ AYB_BROWSER_PATH="/path/to/chrome" npm run qa
 
 ## 发布清单
 
-- [ ] 设置真实 `NEXT_PUBLIC_SITE_URL` 与 HTTPS
+- [ ] 设置真实 `NEXT_PUBLIC_SITE_URL` 与 HTTPS，并把 `AYB_COOKIE_SECURE` 显式设为 `true`
 - [ ] 生产环境保持 `AYB_ENABLE_DEMO=false`
 - [ ] 为 `.data/ayb.sqlite` 配置自动备份，并确保运行用户有写权限
 - [ ] 用 systemd / PM2 让 `npm start` 常驻，并在反向代理层限流

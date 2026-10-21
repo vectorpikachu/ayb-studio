@@ -211,6 +211,7 @@ npm run qa
 - **构建期不能碰数据库**：`src/lib/server/db.ts` 在 `NEXT_PHASE === "phase-production-build"` 时主动报错。任何读取数据库的页面（sitemap、词典、课文、文化索引）必须 `export const dynamic = "force-dynamic"`，否则 `next build` 会尝试初始化 SQLite。
 - **SQLite 类型**：`review_states.interval_days` 必须是 `REAL`；10 分钟是 `0.00694` 天，写成 INTEGER 会被截断成 0。
 - **复习记录不外键到词表**：`review_states.word_id` 指向可能只存在于 `word_overrides` 的词，也不能因种子变动级联删除学习历史。
+- **HTTP 下的 Secure Cookie**：站点只用 HTTP（备案前的 IP 访问）时，`NODE_ENV=production` 会让会话 Cookie 带 `Secure` 而被浏览器丢弃，表现为“登录成功但仍是未登录”。`Secure` 由 `AYB_COOKIE_SECURE`（`auto`/`true`/`false`）控制，反代必须透传 `X-Forwarded-Proto`。
 - **WAL 备份**：SQLite 是 WAL 模式，运行中直接复制 `ayb.sqlite` 可能漏掉尚未 checkpoint 的数据；备份前停服务，或连同 `-wal` / `-shm` 一起复制。
 - **旧 JSON 只迁移一次**：`.data/ayb.db.json` 在数据库首次初始化时导入，原文件保留为备份；之后即使再改动该 JSON 也不会重新读取。
 - **`node:sqlite` 是实验 API**：Node 22 会打印一次 ExperimentalWarning；不要因为它“吓人”就换回 JSON 或引入原生依赖。

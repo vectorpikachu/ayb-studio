@@ -22,7 +22,7 @@ async function handleDemo(request: Request) {
 
   const token = await createSession(user.id);
   const response = NextResponse.json({ user });
-  response.cookies.set(SESSION_COOKIE, token, sessionCookieOptions());
+  response.cookies.set(SESSION_COOKIE, token, sessionCookieOptions(request));
   return response;
 }
 

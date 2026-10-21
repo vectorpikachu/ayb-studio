@@ -38,6 +38,8 @@ Next.js 15 App Router
 - 管理员：`role === "admin"`。
 - 演示账号由 `AYB_ENABLE_DEMO=true` 开启。
 - 生产环境由首个注册账号或 `AYB_ADMIN_EMAIL` 指定管理员。
+- `Secure` 属性由 `AYB_COOKIE_SECURE` 控制（`auto` 默认 / `true` / `false`）。`auto` 读 `X-Forwarded-Proto`，没有该头时看请求 URL 的协议；Nginx 必须透传 `X-Forwarded-Proto`，否则 HTTPS 下会被判成 HTTP。
+- 2026-10-21 的事故：服务以 `NODE_ENV=production` 跑，但站点只有 HTTP（备案前用 IP 访问），Cookie 一律带 `Secure`，浏览器直接丢弃 → 注册、登录都返回成功，界面却始终未登录。数据库里账号是好的，不要误判为密码问题。
 
 ### 内容合并
 
@@ -167,6 +169,8 @@ await page.evaluate(() => [document.documentElement.scrollWidth, innerWidth]);
 - `next build` 前停掉 `next start` / `next dev`，否则 `.next` 可能冲突。
 - `next dev -- -p 3001` 会同时带脚本里的 `-p 3000`，但命令行后面的 `-p 3001` 生效；确认输出端口。
 - `public/` 是运行时静态资源，替换 favicon 不一定要重建，但代码改动必须重建。
+- 登录“成功但仍未登录”，先看响应里的 `Set-Cookie` 有没有 `Secure`：HTTP 站点上的 `Secure` Cookie 会被浏览器忽略。用 `curl -si` 加/不加 `X-Forwarded-Proto: https` 各请求一次即可定位。
+- 生产服务重启前先确认 3101 之类的临时实例已按 PID 停掉（`next start` 的进程名是 `next-server`，`pkill -f 3101` 匹配不到，会 `EADDRINUSE`）。
 
 ### 内容覆盖
 

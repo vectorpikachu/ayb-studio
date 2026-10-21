@@ -9,11 +9,41 @@ import { hashPassword, verifyPassword } from "./password";
 export const SESSION_COOKIE = "ayb_session";
 export const SESSION_TTL_SECONDS = 60 * 60 * 24 * 30;
 
-export function sessionCookieOptions() {
+/**
+ * Cookie 的 Secure 属性开关。
+ * - auto（默认）：按请求实际协议判断，HTTPS 才加 Secure，便于备案前用 HTTP/IP 访问；
+ * - always：强制加 Secure，正式上线走 HTTPS 后建议显式设置；
+ * - never：强制不加 Secure，仅限内网或调试。
+ * 通过环境变量 AYB_COOKIE_SECURE 切换（true/false 分别等同 always/never）。
+ */
+export type CookieSecureMode = "auto" | "always" | "never";
+
+export function cookieSecureMode(): CookieSecureMode {
+  const raw = process.env.AYB_COOKIE_SECURE?.trim().toLowerCase();
+  if (raw === "true" || raw === "always") return "always";
+  if (raw === "false" || raw === "never") return "never";
+  return "auto";
+}
+
+function isHttpsRequest(request?: Request): boolean {
+  if (!request) return process.env.NODE_ENV === "production";
+  const forwarded = request.headers.get("x-forwarded-proto");
+  if (forwarded) return forwarded.split(",")[0]?.trim().toLowerCase() === "https";
+  try {
+    return new URL(request.url).protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+export function sessionCookieOptions(request?: Request) {
+  const mode = cookieSecureMode();
+  const secure =
+    mode === "always" ? true : mode === "never" ? false : isHttpsRequest(request);
   return {
     httpOnly: true,
     sameSite: "lax" as const,
-    secure: process.env.NODE_ENV === "production",
+    secure,
     path: "/",
     maxAge: SESSION_TTL_SECONDS,
   };

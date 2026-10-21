@@ -227,10 +227,6 @@ export function RegisterForm({ firstRun = false }: { firstRun?: boolean }) {
           登录
         </Link>
       </p>
-      <p className="mt-6 flex items-center justify-center gap-1.5 text-[8px] tracking-[0.05em] text-[var(--faint)]">
-        <LockKeyhole size={9} />
-        密码经过 scrypt 哈希，不会以明文保存
-      </p>
     </div>
   );
 }

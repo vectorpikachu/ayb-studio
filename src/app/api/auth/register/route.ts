@@ -32,7 +32,7 @@ async function handleRegister(request: Request) {
 
   const token = await createSession(result.user.id);
   const response = NextResponse.json({ user: result.user }, { status: 201 });
-  response.cookies.set(SESSION_COOKIE, token, sessionCookieOptions());
+  response.cookies.set(SESSION_COOKIE, token, sessionCookieOptions(request));
   return response;
 }
 

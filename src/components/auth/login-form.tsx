@@ -203,10 +203,6 @@ export function LoginForm({ demoEnabled, demoEmail, demoPassword }: Props) {
           创建一个
         </Link>
       </p>
-      <p className="mt-6 flex items-center justify-center gap-1.5 text-[8px] tracking-[0.05em] text-[var(--faint)]">
-        <LockKeyhole size={9} />
-        会话保存在 HttpOnly Cookie 中，密码经过 scrypt 哈希
-      </p>
     </div>
   );
 }

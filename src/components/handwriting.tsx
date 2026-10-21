@@ -22,7 +22,7 @@ export function Handwriting({
       <PencilLine
         size={iconSize}
         strokeWidth={1.6}
-        className="mt-[0.45em] shrink-0 text-[var(--faint)]"
+        className="mt-[0.3em] shrink-0 text-[var(--faint)]"
         aria-hidden
       />
       <p

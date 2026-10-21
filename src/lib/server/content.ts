@@ -1,5 +1,6 @@
 import { words as baseWords, type DictionaryWord, type PartOfSpeech } from "@/data/dictionary";
 import { lexiconWords, type LexiconWord } from "@/data/lexicon";
+import { bulkWords, type BulkWord } from "@/data/bulk";
 import {
   grammarLessons as baseLessons,
   grammarLevelLabels,
@@ -34,6 +35,35 @@ function toDictionaryWord(entry: LexiconWord): DictionaryWord {
   };
 }
 
+const BULK_POS: Record<string, PartOfSpeech> = {
+  noun: "noun",
+  verb: "verb",
+  adj: "adjective",
+  adv: "adverb",
+  pron: "pronoun",
+  det: "determiner",
+  num: "numeral",
+  conj: "conjunction",
+  prep: "preposition",
+  postp: "postposition",
+  intj: "interjection",
+  particle: "particle",
+};
+
+function bulkToDictionary(entry: BulkWord): DictionaryWord {
+  return {
+    id: entry.id,
+    hy: entry.hy,
+    translit: entry.translit,
+    pos: BULK_POS[entry.pos] ?? "noun",
+    level: entry.level,
+    category: entry.category,
+    en: entry.en,
+    ru: "",
+    zh: "",
+  };
+}
+
 function normalizeTranslit(word: DictionaryWord): DictionaryWord {
   return {
     ...word,
@@ -47,7 +77,8 @@ function normalizeTranslit(word: DictionaryWord): DictionaryWord {
 export async function getContentWords(): Promise<DictionaryWord[]> {
   const database = await readDatabase();
   const extendedWords = lexiconWords.map(toDictionaryWord);
-  return mergeById([...baseWords, ...extendedWords], database.customWords).map(normalizeTranslit);
+  const allWords = [...baseWords, ...extendedWords, ...bulkWords.map(bulkToDictionary)];
+  return mergeById(allWords, database.customWords).map(normalizeTranslit);
 }
 
 export async function getContentWordById(id: string): Promise<DictionaryWord | undefined> {

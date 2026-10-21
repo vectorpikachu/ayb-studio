@@ -151,7 +151,26 @@ await page.evaluate(() => [document.documentElement.scrollWidth, innerWidth]);
 - `next/font` 的 Latin fallback 曾把拉丁字符渲染成 Noto Sans；最终改成手工 `@font-face` + `unicode-range`。
 - Poqrik 没有数字；不要在它的 range 里加数字。
 - First Time Writing 有数字，但和亚美尼亚连笔不搭；它只用于拉丁注释。
+- **两个手写字体必须是两个 family**（`Ayb Armenian Hand` / `Ayb Latin Hand`）。Chromium 在同一 family 里放带 `unicode-range` 的字面时，会丢掉 `descent-override`，手写尾巴重新溢出、被下一行盖住。
+- Poqrik 的真实墨迹是 0.79em ~ -0.449em；`size-adjust: 112%` 后必须配 `ascent-override: 79%` / `descent-override: 45%`，否则 1.4 行高装不下 `լ/ղ/ձ/ց` 的尾巴。
+- `.font-hand` 左右各留 0.34em / 0.2em：Poqrik 的起笔和收笔都超出字宽；底部 0.2em 兜住 `leading-none` 的大字。
 - favicon 是路径，不依赖字体；如果改字体，图标不会自动变。
+
+### 扩展词库与音频
+
+- 扩展词库在 `src/data/lexicon/entries.ts`（1,297 词），源数据与精编词分开，但 `getContentWords()` 会合并为使用可读转写 id 的词条；词典、主题筛选和复习队列都包含它们。
+- UI 不再区分扩展词：没有 EXT 标记、没有来源提示，也不要说“不进入复习”。中/英/俄释义与例句为模型生成，发布前建议母语者复核（只写工程文档）。
+- 数据来源：kaikki.org 的亚美尼亚语 JSONL（Wiktionary，CC BY-SA）+ hermitdave/FrequencyWords 的 `hy_full.txt`。筛选时跳过字母名/形式条目，把屈折形式解析到词元。
+- 音频生成：`npx tsx scripts/generate-audio.ts`。需要 eSpeak NG 的 `hy` 语音和 lame；本地用 `ESPEAK_BIN` / `ESPEAK_DATA` / `ESPEAK_LIBS` / `LAME_BIN` 指向解包后的二进制。
+- 产物：`public/audio/<fnv1a>.mp3` + `manifest.json`；`AudioButton` 有 hy 语音时用 TTS，否则播预生成文件，都没有才提示。
+- Chrome/Edge 不提供 hy-AM 语音，不要删掉预生成音频退回纯 TTS。新增可朗读文案后必须重跑生成脚本。
+
+### 转写
+
+- 全站（词典、复习、首页）在 `getContentWords()` 里用 `src/lib/practical-translit.ts` 重算 `translit`，词头和例句都覆盖。
+- 规则：ծ/ց→ts，ջ→j，ձ→dz，չ/ճ→ch，շ→sh，ժ→zh，խ→kh，ղ→gh，ռ→rr；词首 ե→ye、ո→vo、և→yev；թ/ք/փ→t/k/p；不写撇号或变音符号；ը→ə。
+- 源数据（`src/data/lexicon/entries.ts`、精编 JSON）里可能还是 Wiktionary 学术罗马化，只作源数据，不要直接展示。
+- 词条 id 仍由旧转写生成，**不要**因为转写变化去改 id，否则复习记录会失效。
 
 ### 测试
 

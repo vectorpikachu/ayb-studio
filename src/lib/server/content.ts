@@ -1,4 +1,5 @@
-import { words as baseWords, type DictionaryWord } from "@/data/dictionary";
+import { words as baseWords, type DictionaryWord, type PartOfSpeech } from "@/data/dictionary";
+import { lexiconWords, type LexiconWord } from "@/data/lexicon";
 import {
   grammarLessons as baseLessons,
   grammarLevelLabels,
@@ -9,11 +10,44 @@ import type { ReadingText } from "@/data/reading/types";
 import { cultureEntries as baseCultureEntries } from "@/data/culture";
 import type { CultureEntry } from "@/data/culture/types";
 import { mergeById } from "@/lib/content-utils";
+import { practicalTranslit } from "@/lib/practical-translit";
 import { readDatabase } from "./db";
+
+function extendedLevel(rank: number): "A1" | "A2" | "B1" {
+  if (rank <= 300) return "A1";
+  if (rank <= 600) return "A2";
+  return "B1";
+}
+
+function toDictionaryWord(entry: LexiconWord): DictionaryWord {
+  return {
+    id: entry.id,
+    hy: entry.hy,
+    translit: entry.translit,
+    pos: entry.pos as PartOfSpeech,
+    level: extendedLevel(entry.rank),
+    category: entry.category,
+    en: entry.en,
+    ru: entry.ru,
+    zh: entry.zh,
+    example: entry.example,
+  };
+}
+
+function normalizeTranslit(word: DictionaryWord): DictionaryWord {
+  return {
+    ...word,
+    translit: practicalTranslit(word.hy),
+    example: word.example
+      ? { ...word.example, translit: practicalTranslit(word.example.hy) }
+      : undefined,
+  };
+}
 
 export async function getContentWords(): Promise<DictionaryWord[]> {
   const database = await readDatabase();
-  return mergeById(baseWords, database.customWords);
+  const extendedWords = lexiconWords.map(toDictionaryWord);
+  return mergeById([...baseWords, ...extendedWords], database.customWords).map(normalizeTranslit);
 }
 
 export async function getContentWordById(id: string): Promise<DictionaryWord | undefined> {

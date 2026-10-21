@@ -19,7 +19,11 @@ export type PartOfSpeech =
   | "pronoun"
   | "interjection"
   | "numeral"
-  | "particle";
+  | "particle"
+  | "determiner"
+  | "conjunction"
+  | "preposition"
+  | "postposition";
 
 export type WordLevel = "A1" | "A2" | "B1";
 
@@ -28,6 +32,7 @@ export type WordExample = {
   translit: string;
   en: string;
   zh: string;
+  ru?: string;
 };
 
 export type DictionaryWord = {
@@ -40,7 +45,7 @@ export type DictionaryWord = {
   en: string;
   ru: string;
   zh: string;
-  example: WordExample;
+  example?: WordExample;
   note?: string;
 };
 

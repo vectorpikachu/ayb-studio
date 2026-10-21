@@ -144,7 +144,7 @@ export default async function HomePage() {
     getContentWords(),
     user ? getLearnerOverview(user.id) : Promise.resolve(null),
   ]);
-  const word = getWordOfTheDay(new Date(), allWords);
+  const word = getWordOfTheDay(new Date(), allWords.filter((item) => item.example));
 
   return (
     <div className="overflow-hidden">
@@ -357,23 +357,23 @@ export default async function HomePage() {
                 <div>
                   <span className="eyebrow">例句 · In a sentence</span>
                   <p className="mt-5 font-arm text-[22px] leading-[1.55] text-[var(--ink)] md:text-[25px]">
-                    {word.example.hy}
+                    {word.example!.hy}
                   </p>
                   <p className="mt-2 text-[10px] italic tracking-[0.03em] text-[var(--faint)]">
-                    {word.example.translit}
+                    {word.example!.translit}
                   </p>
                   <Handwriting
-                    text={word.example.hy}
+                    text={word.example!.hy}
                     className="mt-2.5"
                     textClassName="text-[20px] leading-[1.75]"
                     iconSize={11}
                   />
                   <div className="mt-5 space-y-1.5 border-l border-[var(--accent)] pl-4">
                     <p className="text-[11px] leading-relaxed text-[var(--muted)]">
-                      {word.example.zh}
+                      {word.example!.zh}
                     </p>
                     <p className="text-[10px] leading-relaxed text-[var(--faint)]">
-                      {word.example.en}
+                      {word.example!.en}
                     </p>
                   </div>
                 </div>

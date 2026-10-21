@@ -97,6 +97,10 @@ export const posLabels: Record<PartOfSpeech, string> = {
   interjection: "感叹词",
   numeral: "数词",
   particle: "小品词",
+  determiner: "限定词",
+  conjunction: "连词",
+  preposition: "前置词",
+  postposition: "后置词",
 };
 
 export const levelLabels = {

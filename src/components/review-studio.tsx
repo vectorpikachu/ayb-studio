@@ -556,20 +556,25 @@ export function ReviewStudio({
                             </div>
 
                             <div className="mt-6 grid gap-2 rounded-[14px] border border-[var(--line)] bg-[var(--surface)] px-4">
-                              <div className="flex items-baseline gap-3 border-b border-[var(--line)] py-3">
-                                <span className="w-5 shrink-0 text-[8px] tracking-[0.1em] text-[var(--faint)]">中</span>
-                                <span className="text-[14px] font-medium text-[var(--ink)]">{word.zh}</span>
-                              </div>
+                              {word.zh ? (
+                                <div className="flex items-baseline gap-3 border-b border-[var(--line)] py-3">
+                                  <span className="w-5 shrink-0 text-[8px] tracking-[0.1em] text-[var(--faint)]">中</span>
+                                  <span className="text-[14px] font-medium text-[var(--ink)]">{word.zh}</span>
+                                </div>
+                              ) : null}
                               <div className="flex items-baseline gap-3 border-b border-[var(--line)] py-2.5">
                                 <span className="w-5 shrink-0 text-[8px] tracking-[0.1em] text-[var(--faint)]">EN</span>
                                 <span className="text-[11px] text-[var(--muted)]" lang="en">{word.en}</span>
                               </div>
-                              <div className="flex items-baseline gap-3 py-2.5">
-                                <span className="w-5 shrink-0 text-[8px] tracking-[0.1em] text-[var(--faint)]">RU</span>
-                                <span className="text-[11px] text-[var(--muted)]" lang="ru">{word.ru}</span>
-                              </div>
+                              {word.ru ? (
+                                <div className="flex items-baseline gap-3 py-2.5">
+                                  <span className="w-5 shrink-0 text-[8px] tracking-[0.1em] text-[var(--faint)]">RU</span>
+                                  <span className="text-[11px] text-[var(--muted)]" lang="ru">{word.ru}</span>
+                                </div>
+                              ) : null}
                             </div>
 
+                            {word.example ? (
                             <div className="mt-4 rounded-[16px] border border-[var(--line)] bg-[color-mix(in_srgb,var(--surface-2)_38%,transparent)] p-4 md:p-5">
                               <div className="flex items-center justify-between gap-3">
                                 <span className="eyebrow">例句 · In a sentence</span>
@@ -596,6 +601,7 @@ export function ReviewStudio({
                                 {word.example.en}
                               </p>
                             </div>
+                            ) : null}
 
                             {word.note && (
                               <p className="mt-4 text-[9px] leading-[1.8] text-[var(--faint)]">

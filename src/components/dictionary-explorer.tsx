@@ -25,11 +25,27 @@ import {
   dictionaryCategories,
   levelLabels,
   posLabels,
+  type CategoryId,
   type DictionaryWord,
+  type WordExample,
 } from "@/data/dictionary";
 import { cn } from "@/lib/utils";
 
 const PAGE_SIZE = 24;
+
+type ExplorerWord = {
+  id: string;
+  hy: string;
+  translit: string;
+  en: string;
+  zh: string;
+  ru: string;
+  posLabel: string;
+  level: "A1" | "A2" | "B1";
+  category: CategoryId;
+  example?: WordExample;
+  note?: string;
+};
 
 function normalize(value: string) {
   return value.normalize("NFC").toLocaleLowerCase("hy").trim();
@@ -45,25 +61,43 @@ export function DictionaryExplorer({ words }: { words: DictionaryWord[] }) {
   const [category, setCategory] = useState<string>("all");
   const [letter, setLetter] = useState<string>("all");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const [selectedWord, setSelectedWord] = useState<DictionaryWord | null>(null);
+  const [selectedWord, setSelectedWord] = useState<ExplorerWord | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const deferredQuery = useDeferredValue(query);
   const reducedMotion = useReducedMotion();
 
-  const alphabeticallySorted = useMemo(
-    () => [...words].sort((a, b) => a.hy.localeCompare(b.hy, "hy")),
+  const entries = useMemo<ExplorerWord[]>(
+    () =>
+      words.map((word) => ({
+        id: word.id,
+        hy: word.hy,
+        translit: word.translit,
+        en: word.en,
+        zh: word.zh,
+        ru: word.ru,
+        posLabel: posLabels[word.pos],
+        level: word.level,
+        category: word.category,
+        example: word.example,
+        note: word.note,
+      })),
     [words],
+  );
+
+  const orderedWords = useMemo(
+    () => [...entries].sort((a, b) => a.hy.localeCompare(b.hy, "hy")),
+    [entries],
   );
 
   const availableLetters = useMemo(
     () =>
       new Set(
-        alphabeticallySorted
+        orderedWords
           .map((word) => Array.from(word.hy)[0]?.toUpperCase())
           .filter((letter): letter is string => Boolean(letter)),
       ),
-    [alphabeticallySorted],
+    [orderedWords],
   );
 
   const visibleAlphabet = useMemo(
@@ -73,25 +107,19 @@ export function DictionaryExplorer({ words }: { words: DictionaryWord[] }) {
 
   const filteredWords = useMemo(() => {
     const q = normalize(deferredQuery);
-    return alphabeticallySorted.filter((word) => {
+    return orderedWords.filter((word) => {
       if (category !== "all" && word.category !== category) return false;
       if (letter !== "all" && Array.from(word.hy)[0]?.toUpperCase() !== letter) return false;
       if (!q) return true;
+      const meta = categoryMap[word.category];
       const haystack = normalize(
-        [
-          word.hy,
-          word.translit,
-          word.en,
-          word.ru,
-          word.zh,
-          posLabels[word.pos],
-          categoryMap[word.category].label,
-          categoryMap[word.category].en,
-        ].join(" "),
+        [word.hy, word.translit, word.en, word.ru, word.zh, word.posLabel, meta.label, meta.en].join(
+          " ",
+        ),
       );
       return q.split(/\s+/).every((part) => haystack.includes(part));
     });
-  }, [alphabeticallySorted, category, deferredQuery, letter]);
+  }, [orderedWords, category, deferredQuery, letter]);
 
   const shownWords = filteredWords.slice(0, visibleCount);
   const hasActiveFilters = Boolean(query) || category !== "all" || letter !== "all";
@@ -146,7 +174,7 @@ export function DictionaryExplorer({ words }: { words: DictionaryWord[] }) {
   }
 
   function surpriseMe() {
-    const pool = filteredWords.length > 0 ? filteredWords : alphabeticallySorted;
+    const pool = filteredWords.length > 0 ? filteredWords : orderedWords;
     setSelectedWord(pool[Math.floor(Math.random() * pool.length)]);
   }
 
@@ -172,12 +200,13 @@ export function DictionaryExplorer({ words }: { words: DictionaryWord[] }) {
                 找到你的语言。
               </h1>
               <p className="mt-5 max-w-[510px] text-[12px] leading-[1.9] text-[var(--muted)]">
-                亚美尼亚语、英语、俄语与中文互查。每个词条都带着转写、词性，以及一句可以带走的例句。
+                亚美尼亚语、英语、俄语与中文互查。核心词条带例句与发音，全词库提供转写与词性。
               </p>
+
             </div>
             <div className="flex items-center gap-7 border-t border-[var(--line)] pt-5 text-[10px] text-[var(--faint)] md:border-l md:border-t-0 md:pl-8 md:pt-0">
               <div>
-                <p className="font-display text-[34px] leading-none text-[var(--ink)]">{words.length}</p>
+                <p className="font-display text-[34px] leading-none text-[var(--ink)]">{orderedWords.length}</p>
                 <p className="mt-2 tracking-[0.12em]">ENTRIES · 词条</p>
               </div>
               <div>
@@ -238,7 +267,7 @@ export function DictionaryExplorer({ words }: { words: DictionaryWord[] }) {
                 <span className="h-1 w-1 rounded-full bg-[var(--accent)]" />
                 东亚美尼亚语
               </span>
-              <span>A1 — A2 学习型词表</span>
+              <span>A1 — B1 常用词表</span>
               <span className="hidden sm:inline">学习型转写，重音通常在最后一个音节</span>
             </div>
           </div>
@@ -258,12 +287,12 @@ export function DictionaryExplorer({ words }: { words: DictionaryWord[] }) {
             >
               全部
               <span className={cn("text-[8px]", category === "all" ? "opacity-60" : "text-[var(--faint)]")}>
-                {words.length}
+                {orderedWords.length}
               </span>
             </button>
             {dictionaryCategories.map((item) => {
               const active = category === item.id;
-              const count = words.filter((word) => word.category === item.id).length;
+              const count = orderedWords.filter((word) => word.category === item.id).length;
               return (
                 <button
                   key={item.id}
@@ -353,7 +382,7 @@ export function DictionaryExplorer({ words }: { words: DictionaryWord[] }) {
                 {hasActiveFilters
                   ? [
                       query ? `“${query}”` : null,
-                      category !== "all" ? categoryMap[category as keyof typeof categoryMap].label : null,
+                      category !== "all" ? categoryMap[category as CategoryId].label : null,
                       letter !== "all" ? `${letter} 开头` : null,
                     ]
                       .filter(Boolean)
@@ -416,7 +445,7 @@ export function DictionaryExplorer({ words }: { words: DictionaryWord[] }) {
                       <div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[9px] text-[var(--faint)]">
                         <span className="tracking-[0.05em]">{word.translit}</span>
                         <span className="h-[2px] w-[2px] rounded-full bg-[var(--faint)]" />
-                        <span>{posLabels[word.pos]}</span>
+                        <span>{word.posLabel}</span>
                         <span className="h-[2px] w-[2px] rounded-full bg-[var(--faint)]" />
                         <span style={{ color: meta.accent }}>{meta.label}</span>
                       </div>
@@ -433,41 +462,43 @@ export function DictionaryExplorer({ words }: { words: DictionaryWord[] }) {
                   </div>
 
                   <div className="mt-5 grid gap-2 border-t border-[var(--line)] pt-4">
-                    <div className="flex items-baseline gap-3">
-                      <span className="w-5 shrink-0 text-[8px] font-semibold tracking-[0.1em] text-[var(--faint)]">
-                        中
-                      </span>
-                      <span className="truncate text-[13px] font-medium text-[var(--ink)]" lang="zh">
-                        {word.zh}
-                      </span>
-                    </div>
-                    <div className="flex items-baseline gap-3">
-                      <span className="w-5 shrink-0 text-[8px] font-semibold tracking-[0.1em] text-[var(--faint)]">
-                        EN
-                      </span>
-                      <span className="truncate text-[11px] text-[var(--muted)]" lang="en">
-                        {word.en}
-                      </span>
-                    </div>
-                    <div className="flex items-baseline gap-3">
-                      <span className="w-5 shrink-0 text-[8px] font-semibold tracking-[0.1em] text-[var(--faint)]">
-                        RU
-                      </span>
-                      <span className="truncate text-[11px] text-[var(--muted)]" lang="ru">
-                        {word.ru}
-                      </span>
-                    </div>
+                    {[
+                      { label: "中", value: word.zh, lang: "zh", primary: true },
+                      { label: "EN", value: word.en, lang: "en", primary: false },
+                      { label: "RU", value: word.ru, lang: "ru", primary: false },
+                    ]
+                      .filter((row) => row.value)
+                      .map((row) => (
+                        <div key={row.label} className="flex items-baseline gap-3">
+                          <span className="w-5 shrink-0 text-[8px] font-semibold tracking-[0.1em] text-[var(--faint)]">
+                            {row.label}
+                          </span>
+                          <span
+                            className={cn(
+                              "truncate",
+                              row.primary
+                                ? "text-[13px] font-medium text-[var(--ink)]"
+                                : "text-[11px] text-[var(--muted)]",
+                            )}
+                            lang={row.lang}
+                          >
+                            {row.value}
+                          </span>
+                        </div>
+                      ))}
                   </div>
 
-                  <div className="mt-4 flex items-center gap-2.5 border-t border-[var(--line)] pt-3.5">
-                    <Quote size={10} className="shrink-0 text-[var(--faint)]" />
-                    <span className="truncate font-hand text-[16px] text-[var(--muted)]" lang="hy">
-                      {word.example.hy}
-                    </span>
-                    <span className="ml-auto grid h-6 w-6 shrink-0 place-items-center rounded-full border border-[var(--line)] text-[var(--faint)] transition-all group-hover:border-[var(--accent)] group-hover:text-[var(--accent)]">
-                      <ArrowUpRight size={10} />
-                    </span>
-                  </div>
+                  {word.example ? (
+                    <div className="mt-4 flex items-center gap-2.5 border-t border-[var(--line)] pt-3.5">
+                      <Quote size={10} className="shrink-0 text-[var(--faint)]" />
+                      <span className="truncate font-hand text-[16px] text-[var(--muted)]" lang="hy">
+                        {word.example.hy}
+                      </span>
+                      <span className="ml-auto grid h-6 w-6 shrink-0 place-items-center rounded-full border border-[var(--line)] text-[var(--faint)] transition-all group-hover:border-[var(--accent)] group-hover:text-[var(--accent)]">
+                        <ArrowUpRight size={10} />
+                      </span>
+                    </div>
+                  ) : null}
                 </button>
               );
             })}
@@ -481,6 +512,7 @@ export function DictionaryExplorer({ words }: { words: DictionaryWord[] }) {
             <p className="mt-2 max-w-[320px] text-[11px] leading-relaxed text-[var(--faint)]">
               试试更短的关键词，或换一种语言：հայերեն、hello、вода、水。
             </p>
+
             <button type="button" onClick={clearFilters} className="btn btn-ghost mt-6 !min-h-10 !px-5">
               清空筛选
             </button>
@@ -505,8 +537,8 @@ export function DictionaryExplorer({ words }: { words: DictionaryWord[] }) {
 
         <div className="mt-14 flex flex-col items-start justify-between gap-5 border-t border-[var(--line)] pt-6 sm:flex-row sm:items-center">
           <p className="max-w-[560px] text-[9px] leading-[1.8] text-[var(--faint)]">
-            词表为 Ayb 学习词表，释义参考英文维基词典与常用俄亚、英亚词典整理；例句为学习场景原创。
-            建议在正式发布前由亚美尼亚语母语者复核。发音使用浏览器语音合成，音色取决于系统语音包。
+            词表为 Ayb 学习词表，释义参考英文维基词典与常用俄亚、英亚词典整理，例句为学习场景原创。
+            建议在正式发布前由亚美尼亚语母语者复核。发音优先播放预生成的参考音，缺失时回退到浏览器语音合成。
           </p>
           <Link href="/grammar" className="arrow-link shrink-0">
             去读语法
@@ -582,7 +614,7 @@ export function DictionaryExplorer({ words }: { words: DictionaryWord[] }) {
                   <p className="mt-3 text-[11px] tracking-[0.05em] text-[var(--faint)]">
                     {selectedWord.translit}
                     <span className="mx-2 opacity-50">·</span>
-                    {posLabels[selectedWord.pos]}
+                    {selectedWord.posLabel}
                   </p>
                   <Handwriting
                     text={selectedWord.hy}
@@ -596,7 +628,9 @@ export function DictionaryExplorer({ words }: { words: DictionaryWord[] }) {
                       { label: "中", value: selectedWord.zh, lang: "zh", primary: true },
                       { label: "EN", value: selectedWord.en, lang: "en", primary: false },
                       { label: "RU", value: selectedWord.ru, lang: "ru", primary: false },
-                    ].map((row) => (
+                    ]
+                      .filter((row) => row.value)
+                      .map((row) => (
                       <div
                         key={row.label}
                         className="flex items-baseline gap-5 border-b border-[var(--line)] py-3.5 last:border-0"
@@ -618,6 +652,7 @@ export function DictionaryExplorer({ words }: { words: DictionaryWord[] }) {
                     ))}
                   </div>
 
+                  {selectedWord.example ? (
                   <div className="mt-6 rounded-[18px] border border-[var(--line)] bg-[color-mix(in_srgb,var(--surface-2)_42%,transparent)] p-5 md:p-6">
                     <div className="flex items-center justify-between">
                       <span className="eyebrow">例句 · In a sentence</span>
@@ -645,8 +680,14 @@ export function DictionaryExplorer({ words }: { words: DictionaryWord[] }) {
                       <p className="text-[10px] leading-relaxed text-[var(--faint)]" lang="en">
                         {selectedWord.example.en}
                       </p>
+                      {selectedWord.example.ru ? (
+                        <p className="text-[10px] leading-relaxed text-[var(--faint)]" lang="ru">
+                          {selectedWord.example.ru}
+                        </p>
+                      ) : null}
                     </div>
                   </div>
+                  ) : null}
 
                   {selectedWord.note && (
                     <div className="mt-5 flex gap-3 rounded-[14px] border border-[var(--line)] p-4">

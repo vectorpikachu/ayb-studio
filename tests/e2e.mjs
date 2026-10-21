@@ -55,6 +55,45 @@ try {
   );
   assert.ok(fits, "long Armenian word should not overflow its card");
 
+  // Extended words live in the same dictionary, after the curated entries.
+  await search.fill("ծնող");
+  await page.waitForTimeout(500);
+  const extendedCard = page.locator("button[aria-label='查看词条 ծնող']").first();
+  assert.equal(await extendedCard.count(), 1, "extended word should be searchable in the dictionary");
+  await extendedCard.click();
+  await page.waitForTimeout(400);
+  const extendedDialog = page.locator("[role=dialog]");
+  const extendedText = await extendedDialog.innerText();
+  assert.ok(extendedText.includes("parent"), "extended entry should keep its English gloss");
+  assert.ok(extendedText.includes("父母"), "extended entry should have a Chinese gloss");
+  assert.ok(extendedText.includes("родител"), "extended entry should have a Russian gloss");
+  assert.ok(extendedText.includes("例句"), "extended entry should show an example");
+  const reviewLink = extendedDialog.locator("a[href*='/review?word=']");
+  assert.equal(await reviewLink.count(), 1, "extended entries should be reviewable");
+  const reviewHref = await reviewLink.getAttribute("href");
+  const clipResponse = page.waitForResponse(
+    (response) => response.url().includes("/audio/") && response.url().endsWith(".mp3"),
+    { timeout: 10_000 },
+  );
+  await extendedDialog.locator("button[aria-label^='朗读词条']").click();
+  const clip = await clipResponse;
+  assert.ok([200, 206].includes(clip.status()), "bundled pronunciation should load");
+  await page.keyboard.press("Escape");
+  await page.waitForTimeout(300);
+
+  // Extended words live under the normal themes: ծնող (parent) is under People.
+  await search.fill("");
+  await page.waitForTimeout(300);
+  await page.getByRole("button", { name: /人与家人/ }).first().click();
+  await page.waitForTimeout(400);
+  await search.fill("ծնող");
+  await page.waitForTimeout(400);
+  assert.equal(
+    await page.locator("button[aria-label='查看词条 ծնող']").count(),
+    1,
+    "extended word should be filed under its theme",
+  );
+
   // Demo login.
   await page.goto(`${baseURL}/login`, { waitUntil: "networkidle" });
   await page.getByRole("button", { name: /一键进入演示空间/ }).click();
@@ -62,15 +101,28 @@ try {
   await page.waitForTimeout(700);
   assert.ok(await page.locator('button[aria-label$="账户菜单"]').count());
 
+  // The extended word opens in the normal review queue.
+  assert.ok(reviewHref);
+  await page.goto(`${baseURL}${reviewHref}`, { waitUntil: "networkidle" });
+  await page.waitForTimeout(600);
+  assert.ok(
+    (await page.locator("article").innerText()).includes("ծնող"),
+    "extended word should load in the review queue",
+  );
+
   // Review card and required example sentence.
   await page.goto(`${baseURL}/review`, { waitUntil: "networkidle" });
   await page.waitForTimeout(500);
   const flip = page.getByRole("button", { name: /翻开卡片/ });
   if (await flip.count()) {
     await flip.first().click();
-    await page.waitForTimeout(400);
-    const articleText = await page.locator("article").innerText();
-    assert.ok(articleText.includes("例句") || articleText.includes("IN A SENTENCE"));
+    // The card flips with a spring animation; wait for the back face instead
+    // of guessing a delay (this assertion used to flake under load).
+    await page.waitForFunction(
+      () => document.querySelector("article")?.innerText.includes("例句"),
+      null,
+      { timeout: 8000 },
+    );
     const grade = page.getByRole("button", { name: /记得/ });
     await grade.click();
     await page.waitForTimeout(600);
@@ -184,7 +236,7 @@ try {
 
   assert.deepEqual(errors, []);
   console.log(
-    "E2E OK — theme, dictionary, long words, login, review, grammar, admin upload/delete, and writing are working.",
+    "E2E OK — theme, dictionary, long words, extended words in the dictionary + audio, login, review, grammar, admin upload/delete, and writing are working.",
   );
 } finally {
   await browser.close();

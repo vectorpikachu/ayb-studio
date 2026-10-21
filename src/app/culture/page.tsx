@@ -10,6 +10,8 @@ import {
 } from "@/data/culture";
 import { getContentCultureEntries } from "@/lib/server/content";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "文化",
   description:

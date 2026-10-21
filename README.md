@@ -47,13 +47,13 @@ Ayb 是一个可运行、可注册、按用户保存进度的亚美尼亚语学�
 - **账户系统**：注册、登录、退出、演示账号、HttpOnly 会话、30 天有效；每个用户的数据完全隔离。
 - **内容管理**：`/admin` 提供词典与语法 JSON 的批量导入、覆盖和删除；`/admin/library` 另有一个 JSON 编辑器，可新增、修改、删除课文和文化条目（同 id 覆盖内置内容，删除覆盖即恢复）。开发环境的演示账号是管理员，生产环境由首个注册账号或 `AYB_ADMIN_EMAIL` 指定管理员。
 - **夜间 / 日间主题**、响应式布局、PWA manifest 与图标、自定义 404。
-- **零外部服务**：不需要数据库服务器、邮箱服务或第三方 API；本地 JSON 持久化，开箱即用。
+- **零外部服务**：不需要数据库服务器、邮箱服务或第三方 API；本地 SQLite 持久化，开箱即用。
 
 > 页面里带“例句”的复习和语法内容是故意设计的：Ayb 不希望你只记住一个孤立的中文释义。
 
 ## 快速开始
 
-要求：**Node.js ≥ 20.9**（推荐 Node 22），npm。
+要求：**Node.js ≥ 22.13**（推荐 Node 22 LTS），npm。数据库使用 Node 内置的 `node:sqlite`，不需要安装原生依赖；Node 22 首次打开数据库时会打印一次 `ExperimentalWarning`，属预期。
 
 ```bash
 npm install
@@ -79,11 +79,11 @@ npm run dev
 AYB_ENABLE_DEMO=true
 ```
 
-> 演示账户只会在数据库首次创建时播种。若数据库已经存在，再打开开关不会生成新账户；请使用全新数据目录，或手动删除 `.data`（会清空所有数据）。
+> 演示账户只会在数据库首次创建时播种。若数据库已经存在，再打开开关不会生成新账户；请使用全新数据目录，或删除数据目录中的 `ayb.sqlite`（会清空所有数据）。
 
 ## 部署成网站
 
-这是一个完整的 Next.js 网站（服务端 API、登录、JSON 数据库），需要一个 Node.js 进程，不能直接导出成纯静态 HTML。
+这是一个完整的 Next.js 网站（服务端 API、登录、SQLite 数据库），需要一个 Node.js 进程，不能直接导出成纯静态 HTML。
 
 ```bash
 npm run build
@@ -96,25 +96,25 @@ npm start
 2. 用 Nginx / Caddy 反向代理到 `127.0.0.1:3000` 并配置 HTTPS；
 3. 保持 `AYB_ENABLE_DEMO=false`；
 4. 用 systemd / PM2 等让 `npm start` 常驻；
-5. 定期备份 `.data/ayb.db.json`。
+5. 定期备份 `.data/ayb.sqlite`。
 
-数据默认存放在项目根目录的 `.data/ayb.db.json`。该目录已被 `.gitignore` 排除，**不要提交真实用户数据**。
+数据默认存放在项目根目录的 `.data/ayb.sqlite`（SQLite，WAL 模式）。该目录已被 `.gitignore` 排除，**不要提交真实用户数据**。旧版 `.data/ayb.db.json` 会在首次启动时自动导入一次，原文件保留为备份，之后不再读取。
 
 生产环境使用 HTTPS 时，会话 Cookie 会自动带上 `Secure`；请勿在没有 TLS 的公网地址上直接运行。
 
 ```bash
-# 备份
-cp .data/ayb.db.json backups/ayb-$(date +%F).json
+# 备份（建议先停止服务，确保 WAL 已落盘）
+cp .data/ayb.sqlite backups/ayb-$(date +%F).sqlite
 ```
 
-> 不需要 Docker，也不需要 Electron / exe。当前版本依赖服务端 API 和本地 JSON 持久化，所以不能直接 `next export` 成纯静态站点；如果要的是“只读词典 + 语法”的静态页面（不带登录和进度保存），那是另一种更简单的形态，可以另外拆。
+> 不需要 Docker，也不需要 Electron / exe。当前版本依赖服务端 API 和本地 SQLite 持久化，所以不能直接 `next export` 成纯静态站点；如果要的是“只读词典 + 语法”的静态页面（不带登录和进度保存），那是另一种更简单的形态，可以另外拆。
 
 ### 环境变量
 
 | 变量 | 默认值 | 说明 |
 | --- | --- | --- |
 | `NEXT_PUBLIC_SITE_URL` | `http://localhost:3000` | 站点公开 URL，用于 metadata、sitemap。 |
-| `AYB_DATA_DIR` | `./.data` | JSON 数据库目录；生产环境建议用绝对路径，如 `/srv/ayb/data`。 |
+| `AYB_DATA_DIR` | `./.data` | SQLite 数据库目录；生产环境建议用绝对路径，如 `/srv/ayb/data`。 |
 | `AYB_ENABLE_DEMO` | 非生产为 `true` | 是否播种并允许演示账号。生产建议关闭。 |
 | `AYB_ADMIN_EMAIL` | 空 | 指定管理员邮箱；该邮箱注册后获得管理员权限。未设置时，数据库中首个注册账号成为管理员。 |
 | `AYB_TIMEZONE` | 服务器本地时区 | 连续学习日历使用的 IANA 时区，如 `Asia/Shanghai`。 |
@@ -123,11 +123,11 @@ cp .data/ayb.db.json backups/ayb-$(date +%F).json
 
 ### 单实例说明
 
-当前持久化是本地 JSON 文件，适合个人、家庭、小班级或单台 VPS。应用内置了进程内写锁与原子重命名，但没有多实例共享状态。若要横向扩展或做公开社区，请把 `src/lib/server/db.ts` 替换为 Postgres/SQLite（服务端）、将会话与写入锁迁移到数据库，并增加对象存储。
+当前持久化是单个 SQLite 文件，适合个人、家庭、小班级或单台 VPS。写操作通过 `BEGIN IMMEDIATE` 串行化，WAL 模式允许多个读请求并行，但**不要**让多个应用实例同时写同一个数据库文件。若要横向扩展或做公开社区，请把 `src/lib/server/db.ts` 换成 Postgres 之类的共享数据库，并增加对象存储。
 
 ## 内容结构
 
-- **词典**：`136` 个词，10 个主题。
+- **词典**：`13,919` 个词条，10 个主题；其中 `136` 个精编词与 `1,297` 个常用词带中/英/俄释义和例句。
 - **语法**：`15` 节课，约 `174` 分钟阅读量，48 道自测题；覆盖 A1 到 B2，其中 B1 用三节课把七个格、格的变化和复数变格讲完。
 - **课文**：`3` 篇、约 `337` 词：A2 日常生活短文（84 词）、B2 阿博维扬《亚美尼亚的创伤》五段选读（126 词）、B1 恰连茨《我爱我甜蜜的亚美尼亚》全诗四节（127 词）；中文对照、朗读、手写体切换与语言注释。
 - **文化**：`11` 个条目，分历史（2）、文化（3）、人物（3）、地理（3）；从 405 年字母表到亚拉拉特山、埃里温与塞凡湖。
@@ -141,7 +141,7 @@ cp .data/ayb.db.json backups/ayb-$(date +%F).json
 - Next.js 15（App Router）+ React 19 + TypeScript
 - Tailwind CSS 4 + 自定义 CSS 设计变量
 - Motion 弹性动画
-- 本地 JSON 持久化 + 进程内写队列 + 原子写入
+- 本地 SQLite（Node 内置 `node:sqlite`）+ WAL 模式 + `BEGIN IMMEDIATE` 写事务
 - scrypt 密码哈希 + 随机 opaque 会话令牌（数据库只保存 SHA-256 摘要）
 - Node.js `Intl` 本地日期、时区可配置
 - 不依赖任何第三方运行时 API
@@ -200,13 +200,15 @@ src/
       health/                # 健康检查
   components/                # 导航、词典、复习、语法、阅读、文化、作者工具等 UI
   data/
-    dictionary/              # 136 词条，按主题分文件
+    dictionary/              # 136 个精编词条，按主题分文件
+    lexicon/                 # 1,297 个常用词种子
+    bulk/                    # 12,486 个 Wiktionary 词条种子
     grammar/                 # 15 节课程内容
     reading/                 # 课文、生词与语法点
     culture/                 # 历史、文化、人物、地理条目
   lib/
     srs.ts                   # 纯函数间隔重复算法
-    server/                  # JSON 数据库、会话、限流、业务服务
+    server/                  # SQLite 数据库、会话、内容合并与业务服务
 public/
   fonts/                     # 自托管字体与许可文本
   icon-192.png  icon-512.png # PWA 图标
@@ -242,11 +244,11 @@ AYB_BROWSER_PATH="/path/to/chrome" npm run qa
 
 - [ ] 设置真实 `NEXT_PUBLIC_SITE_URL` 与 HTTPS
 - [ ] 生产环境保持 `AYB_ENABLE_DEMO=false`
-- [ ] 为 `.data` 配置自动备份，并确保运行用户有写权限
+- [ ] 为 `.data/ayb.sqlite` 配置自动备份，并确保运行用户有写权限
 - [ ] 用 systemd / PM2 让 `npm start` 常驻，并在反向代理层限流
 - [ ] 由母语者复核词典与语法内容
 - [ ] 补齐邮箱验证、密码重置、隐私政策与用户协议
-- [ ] 将本地 JSON 存储换为共享数据库（若需要多实例）
+- [ ] 将本地 SQLite 换为共享数据库（若需要多实例）
 - [ ] 在反向代理层设置安全响应头
 - [ ] 选择并添加代码许可证
 

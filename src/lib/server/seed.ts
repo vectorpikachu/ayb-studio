@@ -1,10 +1,10 @@
 import { randomUUID } from "node:crypto";
 import type {
   ActivityRecord,
-  Database,
   GrammarProgress,
   ReviewGrade,
   ReviewState,
+  SeedSnapshot,
   WritingRecord,
 } from "./db-types";
 import { DEMO_EMAIL, DEMO_NAME, DEMO_PASSWORD, isDemoEnabled } from "./demo";
@@ -130,12 +130,12 @@ const demoWriting: WritingRecord = {
   updatedAt: "2026-10-13T18:30:00.000Z",
 };
 
-export async function buildSeedDatabase(): Promise<Database> {
+export async function buildSeedSnapshot(): Promise<SeedSnapshot> {
   const now = new Date();
-  const users: Database["users"] = [];
-  const reviewStates: Database["reviewStates"] = {};
-  const grammarProgress: Database["grammarProgress"] = {};
-  const writings: Database["writings"] = [];
+  const users: SeedSnapshot["users"] = [];
+  const reviewStates: SeedSnapshot["reviewStates"] = {};
+  const grammarProgress: SeedSnapshot["grammarProgress"] = {};
+  const writings: SeedSnapshot["writings"] = [];
   let activities: ActivityRecord[] = [];
 
   if (isDemoEnabled()) {
@@ -169,17 +169,11 @@ export async function buildSeedDatabase(): Promise<Database> {
   }
 
   return {
-    version: 1,
-    createdAt: now.toISOString(),
     users,
     sessions: [],
     reviewStates,
     grammarProgress,
     writings,
     activities,
-    customWords: [],
-    customLessons: [],
-    customReadingTexts: [],
-    customCultureEntries: [],
   };
 }

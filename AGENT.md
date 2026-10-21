@@ -15,7 +15,7 @@ Ayb 是一个安静、可注册、按用户保存进度的亚美尼亚语学习�
 
 - **不要**重新引入 Docker、Docker Compose、Electron、桌面安装包、`.exe`、desktop CI。
 - 部署方式就是 `npm run build && npm start`，前面可以放 Nginx / Caddy。
-- 不要为了“方便部署”把项目改成静态导出：登录、进度、写作、管理员都需要服务端 API 和本地 JSON 数据库。
+- 不要为了“方便部署”把项目改成静态导出：登录、进度、写作、管理员都需要服务端 API 和本地 SQLite 数据库。
 - 用户明确说过：“我现在不想装这个 docker，能不能不用 docker，我就不要这个 exe 之类的了，单纯是一个网站。”
 
 ### 1.2 亚美尼亚语手写体必须是真连笔
@@ -70,8 +70,8 @@ Ayb 是一个安静、可注册、按用户保存进度的亚美尼亚语学习�
 - 词条、语法课、课文、文化条目都要有管理员写入口。
 - `/admin`：词条/语法 JSON 上传、覆盖、删除。
 - `/admin/library`：课文/文化 JSON 编辑器，可新建、修改、删除、下载。
-- 数据模型是 **静态种子 + 数据库自定义覆盖**：相同 `id` 覆盖内置内容；删除覆盖恢复内置。
-- 课文/文化详情页必须保持动态（不要加 `generateStaticParams`），否则管理员覆盖不会立即生效。
+- 数据模型是 **静态种子 + SQLite 覆盖**：词条写入 `word_overrides`，课程/课文/文化写入对应的 `custom_*` payload 表；相同 `id` 覆盖内置内容，删除覆盖恢复内置，种子本身不能被管理员删除。
+- 课文/文化详情页必须保持动态（不要加 `generateStaticParams`），否则管理员覆盖不会立即生效；sitemap、词典、课文、文化索引页也必须 `force-dynamic`。
 - 管理员接口必须检查 `role === "admin"`；页面未登录跳登录，非管理员 404。
 
 ### 1.7 视觉与品牌
@@ -103,7 +103,8 @@ Ayb 是一个安静、可注册、按用户保存进度的亚美尼亚语学习�
 - Next.js 15 App Router + React 19 + TypeScript
 - Tailwind CSS 4 + 自定义 CSS 变量
 - Motion 用于克制动效
-- 本地 JSON 数据库（无外部数据库）
+- 本地 SQLite（Node 内置 `node:sqlite`，`DatabaseSync`；无外部数据库、无原生依赖）
+- Node.js ≥ 22.13；Node 22 打开 SQLite 时会打印一次 ExperimentalWarning，属预期
 - 自托管字体（`public/fonts/`）
 - Playwright Core + 本机 Edge 做 E2E
 
@@ -119,7 +120,7 @@ src/data/
   grammar/               # 15 节课
   reading/               # 3 篇课文
   culture/               # 11 个文化条目
-src/lib/server/          # JSON DB、auth、content merge、admin
+src/lib/server/          # SQLite、auth、content merge、admin
 public/fonts/            # Poqrik / Noto / First Time Writing
 memory/                  # 经验与用户偏好
 ```
@@ -128,7 +129,10 @@ memory/                  # 经验与用户偏好
 
 | 文件 | 作用 |
 | --- | --- |
-| `src/lib/server/content.ts` | 静态种子 + 自定义内容的合并读取 |
+| `src/lib/server/db.ts` | SQLite 连接、schema、首次播种/旧 JSON 迁移、写事务、活动裁剪 |
+| `src/lib/server/word-seed.ts` | 三份 TS 词表 → `words` 表；内容哈希变化时重建种子 |
+| `src/lib/server/word-db.ts` | 有效词查询（种子 + 覆盖）、覆盖的保存/删除 |
+| `src/lib/server/content.ts` | SQLite 词条 + 静态课程/课文/文化种子与 payload 覆盖的合并读取 |
 | `src/lib/server/admin-content.ts` | 管理员快照与保存/删除 |
 | `src/lib/server/admin-validation.ts` | 词条/课程/课文/文化的 zod schema |
 | `src/app/admin/library/page.tsx` | 课文与文化编辑器入口 |
@@ -141,14 +145,15 @@ memory/                  # 经验与用户偏好
 
 ## 3. 数据流
 
-1. `src/data/*` 是种子内容，提交进仓库。
-2. 管理员编辑/上传写入 `.data/ayb.db.json` 的 `custom*` 数组。
-3. `getContent*` 用 `mergeById(base, custom)` 合并；同 id 自定义覆盖内置。
-4. 删除自定义记录 = 恢复内置内容。
-5. 管理员 API 返回完整 snapshot（包含 merged 数组），前端立即更新。
-6. `revalidatePath("/", "layout")` 在写操作后刷新页面缓存。
+1. `src/data/*` 是种子内容，提交进仓库；词表（dictionary / lexicon / bulk）不再在运行时直接参与查询。
+2. 每次启动把三份词表转换成统一行，按内容哈希同步进 SQLite `words` 表；哈希未变就跳过，管理员的 `word_overrides` 不受影响。
+3. 管理员上传写入 SQLite：词条进 `word_overrides`；语法/课文/文化进 `custom_lessons` / `custom_reading_texts` / `custom_culture_entries` 的 `payload_json`。
+4. 有效词 = `words LEFT JOIN word_overrides`，再追加仅存在于覆盖表的词；覆盖词保留种子的原始位置。
+5. 课程/课文/文化 = TS 种子 `mergeById` payload 覆盖；同 id 覆盖内置，删除覆盖恢复内置。
+6. 管理员 API 返回完整 snapshot（含 merged 数组与 `overriddenWordIds`），前端立即更新。
+7. `revalidatePath("/", "layout")` 在写操作后刷新页面缓存。
 
-新增内容类型时，照这个模式做，不要另起一套。
+新增内容类型时，照这个模式做，不要另起一套（payload 表 + zod schema + API + 编辑器）。
 
 ## 4. 常用命令
 
@@ -202,6 +207,12 @@ npm run qa
 - **诗歌换行**：`zh` / `hy` 用 `whitespace-pre-line`，否则诗意会被折成一整段。
 - **数量统计**：README、页面文案、测试断言里的数字容易漂移；改内容后全局搜索旧数字。
 - **不要删内置内容**：管理员只能覆盖/恢复，不能删除种子；这是产品语义。
+- **构建期不能碰数据库**：`src/lib/server/db.ts` 在 `NEXT_PHASE === "phase-production-build"` 时主动报错。任何读取数据库的页面（sitemap、词典、课文、文化索引）必须 `export const dynamic = "force-dynamic"`，否则 `next build` 会尝试初始化 SQLite。
+- **SQLite 类型**：`review_states.interval_days` 必须是 `REAL`；10 分钟是 `0.00694` 天，写成 INTEGER 会被截断成 0。
+- **复习记录不外键到词表**：`review_states.word_id` 指向可能只存在于 `word_overrides` 的词，也不能因种子变动级联删除学习历史。
+- **WAL 备份**：SQLite 是 WAL 模式，运行中直接复制 `ayb.sqlite` 可能漏掉尚未 checkpoint 的数据；备份前停服务，或连同 `-wal` / `-shm` 一起复制。
+- **旧 JSON 只迁移一次**：`.data/ayb.db.json` 在数据库首次初始化时导入，原文件保留为备份；之后即使再改动该 JSON 也不会重新读取。
+- **`node:sqlite` 是实验 API**：Node 22 会打印一次 ExperimentalWarning；不要因为它“吓人”就换回 JSON 或引入原生依赖。
 
 ## 7. 完成定义
 

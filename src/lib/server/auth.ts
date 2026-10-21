@@ -1,8 +1,8 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { cookies } from "next/headers";
 import { cache } from "react";
-import type { SessionUser } from "@/lib/auth-types";
-import { readDatabase, updateDatabase } from "./db";
+import type { SessionUser, UserRole } from "@/lib/auth-types";
+import { withWrite, getDb } from "./db";
 import type { UserRecord } from "./db-types";
 import { hashPassword, verifyPassword } from "./password";
 
@@ -27,6 +27,30 @@ function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
 }
 
+type UserRow = {
+  id: string;
+  name: string;
+  email: string;
+  passwordHash: string;
+  role: string;
+  createdAt: string;
+};
+
+const USER_COLUMNS = `
+  id, name, email, password_hash AS passwordHash, role, created_at AS createdAt
+`;
+
+function toUserRecord(row: UserRow): UserRecord {
+  return {
+    id: row.id,
+    name: row.name,
+    email: row.email,
+    passwordHash: row.passwordHash,
+    role: row.role === "admin" ? "admin" : "learner",
+    createdAt: row.createdAt,
+  };
+}
+
 export function toSessionUser(user: UserRecord): SessionUser {
   return {
     id: user.id,
@@ -38,9 +62,11 @@ export function toSessionUser(user: UserRecord): SessionUser {
 }
 
 export async function findUserByEmail(email: string): Promise<UserRecord | null> {
-  const database = await readDatabase();
-  const normalized = normalizeEmail(email);
-  return database.users.find((user) => user.email === normalized) ?? null;
+  const db = await getDb();
+  const row = db
+    .prepare(`SELECT ${USER_COLUMNS} FROM users WHERE email = ?`)
+    .get(normalizeEmail(email)) as unknown as UserRow | undefined;
+  return row ? toUserRecord(row) : null;
 }
 
 export async function authenticateUser(
@@ -63,36 +89,37 @@ export async function registerUser(input: {
   password: string;
 }): Promise<RegisterResult> {
   const email = normalizeEmail(input.email);
-  const existing = await findUserByEmail(email);
-  if (existing) return { ok: false, reason: "EMAIL_TAKEN" };
-
   const passwordHash = await hashPassword(input.password);
-  const user: UserRecord = {
-    id: randomUUID(),
-    name: input.name.trim(),
-    email,
-    passwordHash,
-    role: "learner",
-    createdAt: new Date().toISOString(),
-  };
+  const configuredAdmin = process.env.AYB_ADMIN_EMAIL?.trim().toLowerCase();
 
-  const result = await updateDatabase<{ created: boolean; user?: UserRecord }>((database) => {
-    if (database.users.some((candidate) => candidate.email === email)) {
-      return { created: false };
-    }
+  const createdUser = await withWrite((db) => {
+    const existing = db.prepare("SELECT id FROM users WHERE email = ?").get(email);
+    if (existing) return null;
 
-    const configuredAdmin = process.env.AYB_ADMIN_EMAIL?.trim().toLowerCase();
-    const hasAdmin = database.users.some((candidate) => candidate.role === "admin");
-    const createdUser: UserRecord = {
-      ...user,
-      role: configuredAdmin === email || !hasAdmin ? "admin" : "learner",
+    const adminRow = db
+      .prepare("SELECT COUNT(*) AS n FROM users WHERE role = 'admin'")
+      .get() as { n: number } | undefined;
+    const hasAdmin = Number(adminRow?.n ?? 0) > 0;
+    const role: UserRole = configuredAdmin === email || !hasAdmin ? "admin" : "learner";
+    const user: UserRecord = {
+      id: randomUUID(),
+      name: input.name.trim(),
+      email,
+      passwordHash,
+      role,
+      createdAt: new Date().toISOString(),
     };
-    database.users.push(createdUser);
-    return { created: true, user: createdUser };
+
+    db.prepare(`
+      INSERT INTO users (id, name, email, password_hash, role, created_at)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).run(user.id, user.name, user.email, user.passwordHash, user.role, user.createdAt);
+
+    return user;
   });
 
-  if (!result.created || !result.user) return { ok: false, reason: "EMAIL_TAKEN" };
-  return { ok: true, user: toSessionUser(result.user) };
+  if (!createdUser) return { ok: false, reason: "EMAIL_TAKEN" };
+  return { ok: true, user: toSessionUser(createdUser) };
 }
 
 export async function createSession(userId: string): Promise<string> {
@@ -101,16 +128,12 @@ export async function createSession(userId: string): Promise<string> {
   const now = new Date();
   const expiresAt = new Date(now.getTime() + SESSION_TTL_SECONDS * 1000).toISOString();
 
-  await updateDatabase((database) => {
-    database.sessions = database.sessions.filter(
-      (session) => new Date(session.expiresAt).getTime() > now.getTime(),
-    );
-    database.sessions.push({
-      tokenHash,
-      userId,
-      createdAt: now.toISOString(),
-      expiresAt,
-    });
+  await withWrite((db) => {
+    db.prepare("DELETE FROM sessions WHERE expires_at <= ?").run(now.toISOString());
+    db.prepare(`
+      INSERT INTO sessions (token_hash, user_id, created_at, expires_at)
+      VALUES (?, ?, ?, ?)
+    `).run(tokenHash, userId, now.toISOString(), expiresAt);
   });
 
   return token;
@@ -119,20 +142,32 @@ export async function createSession(userId: string): Promise<string> {
 export async function deleteSessionByToken(token: string): Promise<void> {
   if (!token) return;
   const tokenHash = hashToken(token);
-  await updateDatabase((database) => {
-    database.sessions = database.sessions.filter((session) => session.tokenHash !== tokenHash);
+  await withWrite((db) => {
+    db.prepare("DELETE FROM sessions WHERE token_hash = ?").run(tokenHash);
   });
 }
 
 export async function getSessionUserFromToken(token: string): Promise<SessionUser | null> {
   if (!token) return null;
-  const database = await readDatabase();
-  const tokenHash = hashToken(token);
-  const session = database.sessions.find((candidate) => candidate.tokenHash === tokenHash);
-  if (!session) return null;
-  if (new Date(session.expiresAt).getTime() <= Date.now()) return null;
-  const user = database.users.find((candidate) => candidate.id === session.userId);
-  return user ? toSessionUser(user) : null;
+  const db = await getDb();
+  const row = db
+    .prepare(`
+      SELECT u.id, u.name, u.email, u.role, u.created_at AS createdAt
+      FROM sessions s
+      INNER JOIN users u ON u.id = s.user_id
+      WHERE s.token_hash = ? AND s.expires_at > ?
+    `)
+    .get(hashToken(token), new Date().toISOString()) as unknown as
+    | Omit<UserRow, "passwordHash">
+    | undefined;
+  if (!row) return null;
+  return {
+    id: row.id,
+    name: row.name,
+    email: row.email,
+    role: row.role === "admin" ? "admin" : "learner",
+    createdAt: row.createdAt,
+  };
 }
 
 export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {

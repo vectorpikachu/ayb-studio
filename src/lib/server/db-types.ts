@@ -54,17 +54,28 @@ export type SessionRecord = {
   expiresAt: string;
 };
 
-export type Database = {
-  version: 1;
-  createdAt: string;
+/**
+ * The shape produced by the demo seed builder. It is only used while creating
+ * a brand-new database, never as a runtime snapshot of the SQLite store.
+ */
+export type SeedSnapshot = {
   users: UserRecord[];
   sessions: SessionRecord[];
   reviewStates: Record<string, Record<string, ReviewState>>;
   grammarProgress: Record<string, Record<string, GrammarProgress>>;
   writings: WritingRecord[];
   activities: ActivityRecord[];
-  customWords: DictionaryWord[];
-  customLessons: GrammarLesson[];
-  customReadingTexts: ReadingText[];
-  customCultureEntries: CultureEntry[];
+};
+
+/**
+ * The previous `.data/ayb.db.json` format. It is read exactly once when the
+ * SQLite database is created for the first time.
+ */
+export type LegacyDatabase = SeedSnapshot & {
+  version?: number;
+  createdAt?: string;
+  customWords?: DictionaryWord[];
+  customLessons?: GrammarLesson[];
+  customReadingTexts?: ReadingText[];
+  customCultureEntries?: CultureEntry[];
 };

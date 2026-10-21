@@ -1,8 +1,7 @@
-import { words as baseWords } from "@/data/dictionary";
-import { grammarLessons as baseLessons } from "@/data/grammar";
 import type { ReviewOverview } from "@/lib/review-types";
-import type { Database } from "./db-types";
-import { readDatabase } from "./db";
+import { getContentGrammarLessons } from "./content";
+import { getDb } from "./db";
+import { countWords } from "./word-db";
 
 function dateKey(date: Date): string {
   return new Intl.DateTimeFormat("en-CA", {
@@ -13,25 +12,51 @@ function dateKey(date: Date): string {
   }).format(date);
 }
 
-export function buildLearnerOverview(database: Database, userId: string): ReviewOverview {
-  const now = Date.now();
-  const states = database.reviewStates[userId] ?? {};
-  const knownWordIds = new Set([
-    ...baseWords.map((word) => word.id),
-    ...database.customWords.map((word) => word.id),
+const VALID_REVIEW_WORD = `
+  (
+    EXISTS (SELECT 1 FROM words w WHERE w.id = rs.word_id)
+    OR EXISTS (SELECT 1 FROM word_overrides o WHERE o.id = rs.word_id)
+  )
+`;
+
+export async function getLearnerOverview(userId: string): Promise<ReviewOverview> {
+  const [db, totalWords, lessons] = await Promise.all([
+    getDb(),
+    countWords(),
+    getContentGrammarLessons(),
   ]);
-  const validStates = Object.entries(states).filter(([wordId]) => knownWordIds.has(wordId));
-  const dueCount = validStates.filter(
-    ([, state]) => new Date(state.due).getTime() <= now,
+
+  const learnedRow = db
+    .prepare(`
+      SELECT COUNT(*) AS n FROM review_states rs
+      WHERE rs.user_id = ? AND ${VALID_REVIEW_WORD}
+    `)
+    .get(userId) as { n: number } | undefined;
+  const learnedCount = Number(learnedRow?.n ?? 0);
+
+  const dueRow = db
+    .prepare(`
+      SELECT COUNT(*) AS n FROM review_states rs
+      WHERE rs.user_id = ? AND rs.due <= ? AND ${VALID_REVIEW_WORD}
+    `)
+    .get(userId, new Date().toISOString()) as { n: number } | undefined;
+
+  const knownLessonIds = new Set(lessons.map((lesson) => lesson.id));
+  const progressRows = db
+    .prepare("SELECT lesson_id AS lessonId FROM grammar_progress WHERE user_id = ?")
+    .all(userId) as { lessonId: string }[];
+  const grammarCompleted = progressRows.filter((row) =>
+    knownLessonIds.has(row.lessonId),
   ).length;
-  const learnedCount = validStates.length;
 
-  const knownLessonIds = new Set([
-    ...baseLessons.map((lesson) => lesson.id),
-    ...database.customLessons.map((lesson) => lesson.id),
-  ]);
+  const writingRow = db
+    .prepare("SELECT COUNT(*) AS n FROM writings WHERE user_id = ?")
+    .get(userId) as { n: number } | undefined;
 
-  const activities = database.activities.filter((activity) => activity.userId === userId);
+  const activities = db
+    .prepare("SELECT type, at FROM activities WHERE user_id = ?")
+    .all(userId) as { type: string; at: string }[];
+
   const activeDays = new Set(activities.map((activity) => dateKey(new Date(activity.at))));
   const today = new Date();
   const todayKey = dateKey(today);
@@ -48,26 +73,16 @@ export function buildLearnerOverview(database: Database, userId: string): Review
     (activity) => activity.type === "review" && dateKey(new Date(activity.at)) === todayKey,
   ).length;
 
-  const grammarProgress = database.grammarProgress[userId] ?? {};
-  const grammarCompleted = Object.keys(grammarProgress).filter((id) =>
-    knownLessonIds.has(id),
-  ).length;
-
   return {
-    dueCount,
-    newCount: Math.max(0, knownWordIds.size - learnedCount),
+    dueCount: Number(dueRow?.n ?? 0),
+    newCount: Math.max(0, totalWords - learnedCount),
     learnedCount,
-    totalWords: knownWordIds.size,
+    totalWords,
     streak,
     reviewedToday,
     totalReviews: activities.filter((activity) => activity.type === "review").length,
     grammarCompleted,
     grammarTotal: knownLessonIds.size,
-    writingCount: database.writings.filter((writing) => writing.userId === userId).length,
+    writingCount: Number(writingRow?.n ?? 0),
   };
-}
-
-export async function getLearnerOverview(userId: string): Promise<ReviewOverview> {
-  const database = await readDatabase();
-  return buildLearnerOverview(database, userId);
 }

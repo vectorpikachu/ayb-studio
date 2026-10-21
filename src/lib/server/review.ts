@@ -3,12 +3,56 @@ import { dictionaryCategories } from "@/data/dictionary";
 import type { DictionaryWord } from "@/data/dictionary/types";
 import type { ReviewSessionCard, ReviewSessionPayload } from "@/lib/review-types";
 import { scheduleReview, type ReviewGrade, type ReviewState } from "@/lib/srs";
-import { getContentWords } from "./content";
-import { readDatabase, updateDatabase } from "./db";
-import { buildLearnerOverview } from "./stats";
+import { getContentWordById, getContentWords } from "./content";
+import { getDb, insertActivityRecord, withWrite } from "./db";
+import { getLearnerOverview } from "./stats";
 
 const MAX_DUE_CARDS = 12;
 const MAX_NEW_CARDS = 8;
+
+type ReviewStateRow = {
+  wordId: string;
+  ease: number;
+  interval: number;
+  repetitions: number;
+  lapses: number;
+  due: string;
+  lastReviewed: string;
+  lastGrade: number;
+};
+
+const REVIEW_STATE_COLUMNS = `
+  word_id AS wordId, ease, interval_days AS interval, repetitions, lapses,
+  due, last_reviewed AS lastReviewed, last_grade AS lastGrade
+`;
+
+function toReviewState(row: ReviewStateRow): ReviewState {
+  return {
+    ease: Number(row.ease),
+    interval: Number(row.interval),
+    repetitions: Number(row.repetitions),
+    lapses: Number(row.lapses),
+    due: row.due,
+    lastReviewed: row.lastReviewed,
+    lastGrade: (Number(row.lastGrade) === 3
+      ? 3
+      : Number(row.lastGrade) === 1
+        ? 1
+        : Number(row.lastGrade) === 0
+          ? 0
+          : 2) as ReviewGrade,
+  };
+}
+
+export async function loadReviewStates(
+  userId: string,
+): Promise<Record<string, ReviewState>> {
+  const db = await getDb();
+  const rows = db
+    .prepare(`SELECT ${REVIEW_STATE_COLUMNS} FROM review_states WHERE user_id = ?`)
+    .all(userId) as unknown as ReviewStateRow[];
+  return Object.fromEntries(rows.map((row) => [row.wordId, toReviewState(row)]));
+}
 
 function isDue(state: ReviewState, now: number) {
   return new Date(state.due).getTime() <= now;
@@ -39,8 +83,11 @@ export async function createReviewSession(
   userId: string,
   options: { focusWordId?: string } = {},
 ): Promise<ReviewSessionPayload> {
-  const [database, contentWords] = await Promise.all([readDatabase(), getContentWords()]);
-  const states = database.reviewStates[userId] ?? {};
+  const [contentWords, states, overview] = await Promise.all([
+    getContentWords(),
+    loadReviewStates(userId),
+    getLearnerOverview(userId),
+  ]);
   const now = Date.now();
   const selected: ReviewSessionCard[] = [];
   const selectedIds = new Set<string>();
@@ -86,10 +133,7 @@ export async function createReviewSession(
 
   selected.push(...newCards);
 
-  return {
-    cards: selected,
-    overview: buildLearnerOverview(database, userId),
-  };
+  return { cards: selected, overview };
 }
 
 export async function gradeReviewWord(
@@ -97,30 +141,53 @@ export async function gradeReviewWord(
   wordId: string,
   grade: ReviewGrade,
 ): Promise<ReviewState> {
-  const contentWords = await getContentWords();
-  const word = contentWords.find((candidate) => candidate.id === wordId);
+  const word = await getContentWordById(wordId);
   if (!word) throw new Error("UNKNOWN_WORD");
 
   const now = new Date();
 
-  return updateDatabase((database) => {
-    const previous = database.reviewStates[userId]?.[wordId] ?? null;
+  return withWrite((db) => {
+    const row = db
+      .prepare(`
+        SELECT ${REVIEW_STATE_COLUMNS}
+        FROM review_states WHERE user_id = ? AND word_id = ?
+      `)
+      .get(userId, wordId) as unknown as ReviewStateRow | undefined;
+    const previous = row ? toReviewState(row) : null;
     const nextState = scheduleReview(previous, grade, now);
 
-    database.reviewStates[userId] ??= {};
-    database.reviewStates[userId][wordId] = nextState;
+    db.prepare(`
+      INSERT INTO review_states (
+        user_id, word_id, ease, interval_days, repetitions, lapses,
+        due, last_reviewed, last_grade
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(user_id, word_id) DO UPDATE SET
+        ease = excluded.ease,
+        interval_days = excluded.interval_days,
+        repetitions = excluded.repetitions,
+        lapses = excluded.lapses,
+        due = excluded.due,
+        last_reviewed = excluded.last_reviewed,
+        last_grade = excluded.last_grade
+    `).run(
+      userId,
+      wordId,
+      nextState.ease,
+      nextState.interval,
+      nextState.repetitions,
+      nextState.lapses,
+      nextState.due,
+      nextState.lastReviewed,
+      nextState.lastGrade,
+    );
 
-    database.activities.push({
+    insertActivityRecord(db, {
       id: randomUUID(),
       userId,
       type: "review",
       at: now.toISOString(),
       meta: { wordId, grade },
     });
-
-    if (database.activities.length > 20_000) {
-      database.activities = database.activities.slice(-10_000);
-    }
 
     return nextState;
   });

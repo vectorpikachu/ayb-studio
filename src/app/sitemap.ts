@@ -6,6 +6,8 @@ import {
 } from "@/lib/server/content";
 import { getSiteUrl } from "@/lib/server/site-url";
 
+export const dynamic = "force-dynamic";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [baseUrl, grammarLessons, readingTexts, cultureEntries] = await Promise.all([
     getSiteUrl(),

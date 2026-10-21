@@ -20,7 +20,7 @@ function clamp(value: number, min: number, max: number) {
 
 /**
  * A compact SM-2 inspired scheduler. `interval` is expressed in days, which
- * keeps stored state readable and easy to inspect in the local JSON database.
+ * keeps stored state readable and easy to inspect in the SQLite database.
  */
 export function scheduleReview(
   previous: ReviewState | null,

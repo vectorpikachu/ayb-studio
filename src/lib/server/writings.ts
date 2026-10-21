@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { WritingRecord, WritingStatus } from "./db-types";
-import { readDatabase, updateDatabase } from "./db";
+import { getDb, insertActivityRecord, withWrite } from "./db";
 
 export type WritingInput = {
   title: string;
@@ -13,20 +13,63 @@ export type WritingInput = {
 
 const MAX_WRITINGS_PER_USER = 200;
 
+type WritingRow = {
+  id: string;
+  userId: string;
+  title: string;
+  titleZh: string;
+  body: string;
+  translation: string;
+  tagsJson: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+const WRITING_COLUMNS = `
+  id, user_id AS userId, title, title_zh AS titleZh, body, translation,
+  tags_json AS tagsJson, status, created_at AS createdAt, updated_at AS updatedAt
+`;
+
 function normalizeTags(tags: string[]): string[] {
   return Array.from(new Set(tags.map((tag) => tag.trim()).filter(Boolean))).slice(0, 8);
 }
 
-function writingOrder(left: WritingRecord, right: WritingRecord) {
-  return new Date(right.updatedAt).getTime() - new Date(left.updatedAt).getTime();
+function parseTags(json: string): string[] {
+  try {
+    const parsed = JSON.parse(json) as unknown;
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((tag): tag is string => typeof tag === "string");
+  } catch {
+    return [];
+  }
+}
+
+function toWritingRecord(row: WritingRow): WritingRecord {
+  return {
+    id: row.id,
+    userId: row.userId,
+    title: row.title,
+    titleZh: row.titleZh,
+    body: row.body,
+    translation: row.translation,
+    tags: parseTags(row.tagsJson),
+    status: row.status === "final" ? "final" : "draft",
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+  };
 }
 
 export async function listWritingsForUser(userId: string): Promise<WritingRecord[]> {
-  const database = await readDatabase();
-  return database.writings
-    .filter((writing) => writing.userId === userId)
-    .slice()
-    .sort(writingOrder);
+  const db = await getDb();
+  const rows = db
+    .prepare(`
+      SELECT ${WRITING_COLUMNS} FROM writings
+      WHERE user_id = ?
+      ORDER BY updated_at DESC
+    `)
+    .all(userId) as unknown as WritingRow[];
+  return rows.map(toWritingRecord);
 }
 
 export async function createWritingForUser(
@@ -47,12 +90,32 @@ export async function createWritingForUser(
     updatedAt: now,
   };
 
-  await updateDatabase((database) => {
-    const count = database.writings.filter((item) => item.userId === userId).length;
-    if (count >= MAX_WRITINGS_PER_USER) throw new Error("WRITING_LIMIT");
-    database.writings.push(writing);
+  await withWrite((db) => {
+    const row = db
+      .prepare("SELECT COUNT(*) AS n FROM writings WHERE user_id = ?")
+      .get(userId) as { n: number } | undefined;
+    if (Number(row?.n ?? 0) >= MAX_WRITINGS_PER_USER) throw new Error("WRITING_LIMIT");
+
+    db.prepare(`
+      INSERT INTO writings (
+        id, user_id, title, title_zh, body, translation, tags_json,
+        status, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      writing.id,
+      writing.userId,
+      writing.title,
+      writing.titleZh,
+      writing.body,
+      writing.translation,
+      JSON.stringify(writing.tags),
+      writing.status,
+      writing.createdAt,
+      writing.updatedAt,
+    );
+
     if (writing.status === "final") {
-      database.activities.push({
+      insertActivityRecord(db, {
         id: randomUUID(),
         userId,
         type: "writing",
@@ -72,51 +135,70 @@ export async function updateWritingForUser(
 ): Promise<WritingRecord | null> {
   const now = new Date().toISOString();
 
-  return updateDatabase((database) => {
-    const writing = database.writings.find(
-      (candidate) => candidate.id === writingId && candidate.userId === userId,
-    );
-    if (!writing) return null;
+  return withWrite((db) => {
+    const row = db
+      .prepare(`SELECT ${WRITING_COLUMNS} FROM writings WHERE id = ? AND user_id = ?`)
+      .get(writingId, userId) as unknown as WritingRow | undefined;
+    if (!row) return null;
 
-    const nextBody = patch.body ?? writing.body;
-    const nextStatus = patch.status ?? writing.status;
+    const current = toWritingRecord(row);
+    const nextBody = patch.body ?? current.body;
+    const nextStatus = patch.status ?? current.status;
     if (nextStatus === "final" && !nextBody.trim()) {
       throw new Error("EMPTY_BODY");
     }
 
-    const previousStatus = writing.status;
-    if (patch.title !== undefined) writing.title = patch.title.trim();
-    if (patch.titleZh !== undefined) writing.titleZh = patch.titleZh.trim();
-    if (patch.body !== undefined) writing.body = patch.body;
-    if (patch.translation !== undefined) writing.translation = patch.translation;
-    if (patch.tags !== undefined) writing.tags = normalizeTags(patch.tags);
-    if (patch.status !== undefined) writing.status = patch.status;
-    writing.updatedAt = now;
+    const previousStatus = current.status;
+    const next: WritingRecord = {
+      ...current,
+      title: patch.title !== undefined ? patch.title.trim() : current.title,
+      titleZh: patch.titleZh !== undefined ? patch.titleZh.trim() : current.titleZh,
+      body: nextBody,
+      translation: patch.translation !== undefined ? patch.translation : current.translation,
+      tags: patch.tags !== undefined ? normalizeTags(patch.tags) : current.tags,
+      status: nextStatus,
+      updatedAt: now,
+    };
 
-    if (previousStatus !== "final" && writing.status === "final") {
-      database.activities.push({
+    db.prepare(`
+      UPDATE writings SET
+        title = ?, title_zh = ?, body = ?, translation = ?, tags_json = ?,
+        status = ?, updated_at = ?
+      WHERE id = ? AND user_id = ?
+    `).run(
+      next.title,
+      next.titleZh,
+      next.body,
+      next.translation,
+      JSON.stringify(next.tags),
+      next.status,
+      next.updatedAt,
+      writingId,
+      userId,
+    );
+
+    if (previousStatus !== "final" && next.status === "final") {
+      insertActivityRecord(db, {
         id: randomUUID(),
         userId,
         type: "writing",
         at: now,
-        meta: { writingId: writing.id, status: "final" },
+        meta: { writingId, status: "final" },
       });
-      if (database.activities.length > 20_000) {
-        database.activities = database.activities.slice(-10_000);
-      }
     }
 
-    return { ...writing };
+    return next;
   });
 }
 
-export async function deleteWritingForUser(userId: string, writingId: string): Promise<boolean> {
-  return updateDatabase((database) => {
-    const index = database.writings.findIndex(
-      (writing) => writing.id === writingId && writing.userId === userId,
-    );
-    if (index === -1) return false;
-    database.writings.splice(index, 1);
-    return true;
+export async function deleteWritingForUser(
+  userId: string,
+  writingId: string,
+): Promise<boolean> {
+  return withWrite((db) => {
+    const result = db
+      .prepare("DELETE FROM writings WHERE id = ? AND user_id = ?")
+      .run(writingId, userId);
+    return Number(result.changes) > 0;
   });
 }

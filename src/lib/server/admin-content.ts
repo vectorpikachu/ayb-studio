@@ -1,4 +1,3 @@
-import { words as baseWords } from "@/data/dictionary";
 import { grammarLessons as baseLessons } from "@/data/grammar";
 import { readingTexts as baseReadingTexts } from "@/data/reading";
 import { cultureEntries as baseCultureEntries } from "@/data/culture";
@@ -7,10 +6,23 @@ import type { GrammarLesson } from "@/data/grammar/types";
 import type { ReadingText } from "@/data/reading/types";
 import type { CultureEntry } from "@/data/culture/types";
 import { mergeById } from "@/lib/content-utils";
-import type { Database } from "./db-types";
-import { readDatabase, updateDatabase } from "./db";
+import {
+  getContentCultureEntries,
+  getContentReadingTexts,
+} from "./content";
+import {
+  listCustomPayloads,
+  withWrite,
+  type CustomContentTable,
+} from "./db";
+import {
+  countWords,
+  deleteWordOverride,
+  listOverriddenWordIds,
+  listWordOverrides,
+  saveWordOverrides,
+} from "./word-db";
 
-const MAX_CUSTOM_WORDS = 5000;
 const MAX_CUSTOM_LESSONS = 500;
 const MAX_CUSTOM_READING_TEXTS = 500;
 const MAX_CUSTOM_CULTURE_ENTRIES = 500;
@@ -22,7 +34,7 @@ export type AdminContentSnapshot = {
   customCultureEntries: CultureEntry[];
   readingTexts: ReadingText[];
   cultureEntries: CultureEntry[];
-  baseWordIds: string[];
+  overriddenWordIds: string[];
   baseLessonIds: string[];
   baseReadingIds: string[];
   baseCultureIds: string[];
@@ -38,122 +50,147 @@ export type AdminContentSnapshot = {
   };
 };
 
-const baseWordIds = baseWords.map((word) => word.id);
 const baseLessonIds = baseLessons.map((lesson) => lesson.id);
 const baseReadingIds = baseReadingTexts.map((text) => text.id);
 const baseCultureIds = baseCultureEntries.map((entry) => entry.id);
 
-function snapshot(database: Database): AdminContentSnapshot {
+export async function getAdminContentSnapshot(): Promise<AdminContentSnapshot> {
+  const [
+    customWords,
+    overriddenWordIds,
+    customLessons,
+    customReadingTexts,
+    customCultureEntries,
+    readingTexts,
+    cultureEntries,
+    totalWords,
+  ] = await Promise.all([
+    listWordOverrides(),
+    listOverriddenWordIds(),
+    listCustomPayloads<GrammarLesson>("custom_lessons"),
+    listCustomPayloads<ReadingText>("custom_reading_texts"),
+    listCustomPayloads<CultureEntry>("custom_culture_entries"),
+    getContentReadingTexts(),
+    getContentCultureEntries(),
+    countWords(),
+  ]);
+
   return {
-    customWords: database.customWords,
-    customLessons: database.customLessons,
-    customReadingTexts: database.customReadingTexts,
-    customCultureEntries: database.customCultureEntries,
-    readingTexts: mergeById(baseReadingTexts, database.customReadingTexts).sort(
-      (left, right) => left.order - right.order,
-    ),
-    cultureEntries: mergeById(baseCultureEntries, database.customCultureEntries).sort(
-      (left, right) => left.order - right.order,
-    ),
-    baseWordIds,
+    customWords,
+    customLessons,
+    customReadingTexts,
+    customCultureEntries,
+    readingTexts,
+    cultureEntries,
+    overriddenWordIds,
     baseLessonIds,
     baseReadingIds,
     baseCultureIds,
     counts: {
-      customWords: database.customWords.length,
-      customLessons: database.customLessons.length,
-      customReadingTexts: database.customReadingTexts.length,
-      customCultureEntries: database.customCultureEntries.length,
-      totalWords: mergeById(baseWords, database.customWords).length,
-      totalLessons: mergeById(baseLessons, database.customLessons).length,
-      totalReadingTexts: mergeById(baseReadingTexts, database.customReadingTexts).length,
-      totalCultureEntries: mergeById(baseCultureEntries, database.customCultureEntries).length,
+      customWords: customWords.length,
+      customLessons: customLessons.length,
+      customReadingTexts: customReadingTexts.length,
+      customCultureEntries: customCultureEntries.length,
+      totalWords,
+      totalLessons: mergeById(baseLessons, customLessons).length,
+      totalReadingTexts: mergeById(baseReadingTexts, customReadingTexts).length,
+      totalCultureEntries: mergeById(baseCultureEntries, customCultureEntries).length,
     },
   };
 }
 
-export async function getAdminContentSnapshot(): Promise<AdminContentSnapshot> {
-  return snapshot(await readDatabase());
-}
-
-export async function saveCustomWords(words: DictionaryWord[]): Promise<AdminContentSnapshot> {
-  return updateDatabase((database) => {
-    const merged = new Map(database.customWords.map((word) => [word.id, word]));
-    for (const word of words) merged.set(word.id, word);
-    if (merged.size > MAX_CUSTOM_WORDS) throw new Error("WORD_LIMIT");
-    database.customWords = Array.from(merged.values());
-    return snapshot(database);
-  });
+export async function saveCustomWords(
+  words: DictionaryWord[],
+): Promise<AdminContentSnapshot> {
+  await saveWordOverrides(words);
+  return getAdminContentSnapshot();
 }
 
 export async function deleteCustomWord(id: string): Promise<AdminContentSnapshot> {
-  return updateDatabase((database) => {
-    const next = database.customWords.filter((word) => word.id !== id);
-    if (next.length === database.customWords.length) throw new Error("WORD_NOT_FOUND");
-    database.customWords = next;
-    return snapshot(database);
+  await deleteWordOverride(id);
+  return getAdminContentSnapshot();
+}
+
+async function savePayloads<T extends { id: string }>(
+  table: CustomContentTable,
+  items: T[],
+  limit: number,
+  limitError: string,
+): Promise<void> {
+  await withWrite((db) => {
+    const ids = new Set(
+      (db.prepare(`SELECT id FROM ${table}`).all() as { id: string }[]).map((row) => row.id),
+    );
+    for (const item of items) ids.add(item.id);
+    if (ids.size > limit) throw new Error(limitError);
+
+    const upsert = db.prepare(`
+      INSERT INTO ${table} (id, payload_json, updated_at)
+      VALUES (?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET
+        payload_json = excluded.payload_json,
+        updated_at = excluded.updated_at
+    `);
+    const now = new Date().toISOString();
+    for (const item of items) {
+      upsert.run(item.id, JSON.stringify(item), now);
+    }
+  });
+}
+
+async function deletePayload(
+  table: CustomContentTable,
+  id: string,
+  notFoundError: string,
+): Promise<void> {
+  await withWrite((db) => {
+    const result = db.prepare(`DELETE FROM ${table} WHERE id = ?`).run(id);
+    if (Number(result.changes) === 0) throw new Error(notFoundError);
   });
 }
 
 export async function saveCustomLessons(
   lessons: GrammarLesson[],
 ): Promise<AdminContentSnapshot> {
-  return updateDatabase((database) => {
-    const merged = new Map(database.customLessons.map((lesson) => [lesson.id, lesson]));
-    for (const lesson of lessons) merged.set(lesson.id, lesson);
-    if (merged.size > MAX_CUSTOM_LESSONS) throw new Error("LESSON_LIMIT");
-    database.customLessons = Array.from(merged.values());
-    return snapshot(database);
-  });
+  await savePayloads("custom_lessons", lessons, MAX_CUSTOM_LESSONS, "LESSON_LIMIT");
+  return getAdminContentSnapshot();
 }
 
 export async function deleteCustomLesson(id: string): Promise<AdminContentSnapshot> {
-  return updateDatabase((database) => {
-    const next = database.customLessons.filter((lesson) => lesson.id !== id);
-    if (next.length === database.customLessons.length) throw new Error("LESSON_NOT_FOUND");
-    database.customLessons = next;
-    return snapshot(database);
-  });
+  await deletePayload("custom_lessons", id, "LESSON_NOT_FOUND");
+  return getAdminContentSnapshot();
 }
 
 export async function saveCustomReadingTexts(
   texts: ReadingText[],
 ): Promise<AdminContentSnapshot> {
-  return updateDatabase((database) => {
-    const merged = new Map(database.customReadingTexts.map((text) => [text.id, text]));
-    for (const text of texts) merged.set(text.id, text);
-    if (merged.size > MAX_CUSTOM_READING_TEXTS) throw new Error("READING_LIMIT");
-    database.customReadingTexts = Array.from(merged.values());
-    return snapshot(database);
-  });
+  await savePayloads(
+    "custom_reading_texts",
+    texts,
+    MAX_CUSTOM_READING_TEXTS,
+    "READING_LIMIT",
+  );
+  return getAdminContentSnapshot();
 }
 
 export async function deleteCustomReadingText(id: string): Promise<AdminContentSnapshot> {
-  return updateDatabase((database) => {
-    const next = database.customReadingTexts.filter((text) => text.id !== id);
-    if (next.length === database.customReadingTexts.length) throw new Error("READING_NOT_FOUND");
-    database.customReadingTexts = next;
-    return snapshot(database);
-  });
+  await deletePayload("custom_reading_texts", id, "READING_NOT_FOUND");
+  return getAdminContentSnapshot();
 }
 
 export async function saveCustomCultureEntries(
   entries: CultureEntry[],
 ): Promise<AdminContentSnapshot> {
-  return updateDatabase((database) => {
-    const merged = new Map(database.customCultureEntries.map((entry) => [entry.id, entry]));
-    for (const entry of entries) merged.set(entry.id, entry);
-    if (merged.size > MAX_CUSTOM_CULTURE_ENTRIES) throw new Error("CULTURE_LIMIT");
-    database.customCultureEntries = Array.from(merged.values());
-    return snapshot(database);
-  });
+  await savePayloads(
+    "custom_culture_entries",
+    entries,
+    MAX_CUSTOM_CULTURE_ENTRIES,
+    "CULTURE_LIMIT",
+  );
+  return getAdminContentSnapshot();
 }
 
 export async function deleteCustomCultureEntry(id: string): Promise<AdminContentSnapshot> {
-  return updateDatabase((database) => {
-    const next = database.customCultureEntries.filter((entry) => entry.id !== id);
-    if (next.length === database.customCultureEntries.length) throw new Error("CULTURE_NOT_FOUND");
-    database.customCultureEntries = next;
-    return snapshot(database);
-  });
+  await deletePayload("custom_culture_entries", id, "CULTURE_NOT_FOUND");
+  return getAdminContentSnapshot();
 }

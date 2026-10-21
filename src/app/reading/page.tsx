@@ -5,6 +5,8 @@ import { Reveal } from "@/components/reveal";
 import { countArmenianWords, readingLevelLabels } from "@/data/reading";
 import { getContentReadingTexts } from "@/lib/server/content";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "课文",
   description:

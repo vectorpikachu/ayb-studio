@@ -1,6 +1,4 @@
-import { words as baseWords, type DictionaryWord, type PartOfSpeech } from "@/data/dictionary";
-import { lexiconWords, type LexiconWord } from "@/data/lexicon";
-import { bulkWords, type BulkWord } from "@/data/bulk";
+import type { DictionaryWord } from "@/data/dictionary";
 import {
   grammarLessons as baseLessons,
   grammarLevelLabels,
@@ -12,57 +10,8 @@ import { cultureEntries as baseCultureEntries } from "@/data/culture";
 import type { CultureEntry } from "@/data/culture/types";
 import { mergeById } from "@/lib/content-utils";
 import { practicalTranslit } from "@/lib/practical-translit";
-import { readDatabase } from "./db";
-
-function extendedLevel(rank: number): "A1" | "A2" | "B1" {
-  if (rank <= 300) return "A1";
-  if (rank <= 600) return "A2";
-  return "B1";
-}
-
-function toDictionaryWord(entry: LexiconWord): DictionaryWord {
-  return {
-    id: entry.id,
-    hy: entry.hy,
-    translit: entry.translit,
-    pos: entry.pos as PartOfSpeech,
-    level: extendedLevel(entry.rank),
-    category: entry.category,
-    en: entry.en,
-    ru: entry.ru,
-    zh: entry.zh,
-    example: entry.example,
-  };
-}
-
-const BULK_POS: Record<string, PartOfSpeech> = {
-  noun: "noun",
-  verb: "verb",
-  adj: "adjective",
-  adv: "adverb",
-  pron: "pronoun",
-  det: "determiner",
-  num: "numeral",
-  conj: "conjunction",
-  prep: "preposition",
-  postp: "postposition",
-  intj: "interjection",
-  particle: "particle",
-};
-
-function bulkToDictionary(entry: BulkWord): DictionaryWord {
-  return {
-    id: entry.id,
-    hy: entry.hy,
-    translit: entry.translit,
-    pos: BULK_POS[entry.pos] ?? "noun",
-    level: entry.level,
-    category: entry.category,
-    en: entry.en,
-    ru: "",
-    zh: "",
-  };
-}
+import { listCustomPayloads } from "./db";
+import { getWordById, getWordCatalog } from "./word-db";
 
 function normalizeTranslit(word: DictionaryWord): DictionaryWord {
   return {
@@ -75,20 +24,18 @@ function normalizeTranslit(word: DictionaryWord): DictionaryWord {
 }
 
 export async function getContentWords(): Promise<DictionaryWord[]> {
-  const database = await readDatabase();
-  const extendedWords = lexiconWords.map(toDictionaryWord);
-  const allWords = [...baseWords, ...extendedWords, ...bulkWords.map(bulkToDictionary)];
-  return mergeById(allWords, database.customWords).map(normalizeTranslit);
+  const words = await getWordCatalog();
+  return words.map(normalizeTranslit);
 }
 
 export async function getContentWordById(id: string): Promise<DictionaryWord | undefined> {
-  const words = await getContentWords();
-  return words.find((word) => word.id === id);
+  const word = await getWordById(id);
+  return word ? normalizeTranslit(word) : undefined;
 }
 
 export async function getContentGrammarLessons(): Promise<GrammarLesson[]> {
-  const database = await readDatabase();
-  return mergeById(baseLessons, database.customLessons).sort(
+  const custom = await listCustomPayloads<GrammarLesson>("custom_lessons");
+  return mergeById(baseLessons, custom).sort(
     (left, right) => left.order - right.order,
   );
 }
@@ -115,8 +62,8 @@ export function findAdjacentLessons(lessons: GrammarLesson[], id: string) {
 }
 
 export async function getContentReadingTexts(): Promise<ReadingText[]> {
-  const database = await readDatabase();
-  return mergeById(baseReadingTexts, database.customReadingTexts).sort(
+  const custom = await listCustomPayloads<ReadingText>("custom_reading_texts");
+  return mergeById(baseReadingTexts, custom).sort(
     (left, right) => left.order - right.order,
   );
 }
@@ -127,8 +74,8 @@ export async function getContentReadingText(id: string): Promise<ReadingText | u
 }
 
 export async function getContentCultureEntries(): Promise<CultureEntry[]> {
-  const database = await readDatabase();
-  return mergeById(baseCultureEntries, database.customCultureEntries).sort(
+  const custom = await listCustomPayloads<CultureEntry>("custom_culture_entries");
+  return mergeById(baseCultureEntries, custom).sort(
     (left, right) => left.order - right.order,
   );
 }

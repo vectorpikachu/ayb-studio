@@ -30,7 +30,7 @@ import { cn } from "@/lib/utils";
 type AdminSnapshot = {
   customWords: DictionaryWord[];
   customLessons: GrammarLesson[];
-  baseWordIds: string[];
+  overriddenWordIds: string[];
   baseLessonIds: string[];
   counts: {
     customWords: number;
@@ -67,7 +67,7 @@ export function AdminContentStudio({
   const [deleting, setDeleting] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const baseWordIds = new Set(snapshot.baseWordIds);
+  const overriddenWordIds = new Set(snapshot.overriddenWordIds);
   const baseLessonIds = new Set(snapshot.baseLessonIds);
 
   function resetUpload() {
@@ -456,13 +456,13 @@ export function AdminContentStudio({
                         <WordRow
                           key={word.id}
                           word={word}
-                          override={baseWordIds.has(word.id)}
+                          override={overriddenWordIds.has(word.id)}
                           onDelete={() =>
                             setDeleteTarget({
                               tab: "words",
                               id: word.id,
                               label: word.hy,
-                              override: baseWordIds.has(word.id),
+                              override: overriddenWordIds.has(word.id),
                             })
                           }
                         />

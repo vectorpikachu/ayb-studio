@@ -56,7 +56,7 @@ src/data/* (seed) + custom_* 表的 payload_json
 - 词种子只由 TS 文件决定；管理员不能删除种子，只能覆盖或删除覆盖。
 - 同 `id` 覆盖 seed；删除覆盖 = 恢复 seed；仅存在于覆盖表的词在词典末尾追加。
 - `/admin/library` 与 `/admin` 的 snapshot 同时返回 custom 和 merged，前端无需二次请求。
-- 单词 snapshot 使用 `overriddenWordIds`（只含覆盖了种子的 id），不会把 13,919 个种子 id 发给浏览器。
+- 单词 snapshot 使用 `overriddenWordIds`（只含覆盖了种子的 id），不会把 2,115 个种子 id 发给浏览器。
 
 ### 管理员 API
 
@@ -196,8 +196,9 @@ await page.evaluate(() => [document.documentElement.scrollWidth, innerWidth]);
 
 ### 扩展词库与音频
 
-- 扩展词库在 `src/data/lexicon/entries.ts`（1,297 词），源数据与精编词分开，但 `getContentWords()` 会合并为使用可读转写 id 的词条；词典、主题筛选和复习队列都包含它们。
+- 扩展词库在 `src/data/lexicon/entries.ts`（1,297 词），批量精选词在 `src/data/bulk/entries.ts`（682 词），源数据与精编词分开，但 `getContentWords()` 会合并为使用可读转写 id 的词条；词典、主题筛选和复习队列都包含它们。
 - UI 不再区分扩展词：没有 EXT 标记、没有来源提示，也不要说“不进入复习”。中/英/俄释义与例句为模型生成，发布前建议母语者复核（只写工程文档）。
+- 旧 bulk 保留了 12,486 条只有英文释义的 Wiktionary 原始条目，现已被 682 条精选词替代：按英语释义常用度筛选，人工/模型逐条过滤缩写、单字母、屈折变体、方言借词、同义重复与生僻专名，并补齐四语释义与五字段例句。
 - 数据来源：kaikki.org 的亚美尼亚语 JSONL（Wiktionary，CC BY-SA）+ hermitdave/FrequencyWords 的 `hy_full.txt`。筛选时跳过字母名/形式条目，把屈折形式解析到词元。
 - 音频生成：`npx tsx scripts/generate-audio.ts`。需要 eSpeak NG 的 `hy` 语音和 lame；本地用 `ESPEAK_BIN` / `ESPEAK_DATA` / `ESPEAK_LIBS` / `LAME_BIN` 指向解包后的二进制。
 - 产物：`public/audio/<fnv1a>.mp3` + `manifest.json`；`AudioButton` 有 hy 语音时用 TTS，否则播预生成文件，都没有才提示。

@@ -1,4 +1,4 @@
-import type { CategoryId, WordLevel } from "../dictionary/types";
+import type { CategoryId, WordExample, WordLevel } from "../dictionary/types";
 
 export type BulkWord = {
   id: string;
@@ -9,4 +9,7 @@ export type BulkWord = {
   level: WordLevel;
   category: CategoryId;
   rank: number;
+  zh: string;
+  ru: string;
+  example: WordExample;
 };

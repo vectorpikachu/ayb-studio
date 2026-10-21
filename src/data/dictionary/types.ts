@@ -8,7 +8,13 @@ export type CategoryId =
   | "time"
   | "description"
   | "actions"
-  | "culture";
+  | "culture"
+  | "work"
+  | "technology"
+  | "emotions"
+  | "society"
+  | "transport"
+  | "home";
 
 export type PartOfSpeech =
   | "noun"

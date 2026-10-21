@@ -214,7 +214,7 @@ export const essentials: DictionaryWord[] = [
     translit: "ser",
     pos: "noun",
     level: "A1",
-    category: "essentials",
+    category: "emotions",
     en: "love",
     ru: "любовь",
     zh: "爱",

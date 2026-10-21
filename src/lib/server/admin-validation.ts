@@ -15,6 +15,7 @@ const exampleSchema = z.object({
   translit: shortText(500),
   en: shortText(800),
   zh: shortText(800),
+  ru: optionalText(800),
 });
 
 const wordSchema = z.object({
@@ -31,6 +32,10 @@ const wordSchema = z.object({
     "interjection",
     "numeral",
     "particle",
+    "determiner",
+    "conjunction",
+    "preposition",
+    "postposition",
   ]),
   level: z.enum(["A1", "A2", "B1"]),
   category: z.enum([
@@ -44,6 +49,12 @@ const wordSchema = z.object({
     "description",
     "actions",
     "culture",
+    "work",
+    "technology",
+    "emotions",
+    "society",
+    "transport",
+    "home",
   ]),
   en: shortText(400),
   ru: shortText(400),

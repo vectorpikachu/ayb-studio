@@ -10,11 +10,11 @@ import { bulkWords, type BulkWord } from "@/data/bulk";
  * ordering). The hash is persisted so an existing database is rebuilt on the
  * next start without touching admin overrides.
  */
-const WORD_SEED_VERSION = 1;
+const WORD_SEED_VERSION = 2;
 
 export const MAX_WORD_OVERRIDES = 5000;
 
-type WordSeedSource = "curated" | "common" | "wiktionary";
+type WordSeedSource = "curated" | "common" | "selected";
 
 export type WordSeedRow = {
   id: string;
@@ -103,12 +103,12 @@ function fromBulk(entry: BulkWord): Omit<WordSeedRow, "sortOrder"> {
     level: entry.level,
     category: entry.category,
     en: entry.en,
-    ru: "",
-    zh: "",
-    exampleJson: null,
+    ru: entry.ru,
+    zh: entry.zh,
+    exampleJson: JSON.stringify(entry.example),
     note: null,
     frequencyRank: entry.rank,
-    source: "wiktionary",
+    source: "selected",
   };
 }
 

@@ -200,7 +200,7 @@ export function DictionaryExplorer({ words }: { words: DictionaryWord[] }) {
                 找到你的语言。
               </h1>
               <p className="mt-5 max-w-[510px] text-[12px] leading-[1.9] text-[var(--muted)]">
-                亚美尼亚语、英语、俄语与中文互查。核心词条带例句与发音，全词库提供转写与词性。
+                亚美尼亚语、英语、俄语与中文互查。每个词条都带四语释义、转写、词性与原创例句。
               </p>
 
             </div>
@@ -537,7 +537,8 @@ export function DictionaryExplorer({ words }: { words: DictionaryWord[] }) {
 
         <div className="mt-14 flex flex-col items-start justify-between gap-5 border-t border-[var(--line)] pt-6 sm:flex-row sm:items-center">
           <p className="max-w-[560px] text-[9px] leading-[1.8] text-[var(--faint)]">
-            词表为 Ayb 学习词表，释义参考英文维基词典与常用俄亚、英亚词典整理，例句为学习场景原创。
+            词表为 Ayb 学习词表，只保留适合学习的完整词条，已去除缩写、字母、屈折形式与生僻专名。
+            释义参考英文维基词典与常用俄亚、英亚词典整理，例句为学习场景原创。
             建议在正式发布前由亚美尼亚语母语者复核。发音优先播放预生成的参考音，缺失时回退到浏览器语音合成。
           </p>
           <Link href="/grammar" className="arrow-link shrink-0">
